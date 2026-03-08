@@ -1,0 +1,65 @@
+#rb-edit-summary {
+  font-size: 14px;
+  font-family: LatoWeb, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  color: #fff;
+  display: inline;
+  line-height: 33px;
+  margin-right: 12px;
+}
+#rb-edit-summary .rb-summary-link {
+  cursor: default;
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+#rb-edit-summary .rb-summary-popover {
+  display: none;
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 0;
+  background: #fff;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 16px 20px;
+  font-size: 13px;
+  color: #333;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 1000;
+  width: var(--rb-summary-popover-width, 400px);
+  max-height: var(--rb-summary-popover-max-height, 300px);
+  overflow-y: auto;
+}
+#rb-edit-summary .rb-summary-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 16px;
+  align-items: baseline;
+}
+#rb-edit-summary .rb-summary-popover-desc {
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+#rb-edit-summary .rb-summary-popover-fields {
+  color: #666;
+  white-space: nowrap;
+}
+#rb-edit-summary .rb-summary-wrapper {
+  position: relative;
+  padding-bottom: 12px;
+  margin-bottom: -12px;
+}
+#rb-edit-summary .rb-summary-wrapper:hover .rb-summary-popover {
+  display: block;
+}
+#rb-edit-summary .rb-summary-scroll-hint {
+  position: sticky;
+  bottom: -16px;
+  text-align: center;
+  color: #999;
+  font-size: 11px;
+  padding: 12px 0 4px;
+  background: linear-gradient(transparent, #fff 40%);
+  pointer-events: none;
+}

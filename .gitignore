@@ -1,0 +1,7 @@
+node_modules/
+build/
+test/.auth/
+test-results/
+playwright-report/
+graveyard/
+.claude/

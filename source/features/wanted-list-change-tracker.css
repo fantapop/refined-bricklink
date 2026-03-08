@@ -1,0 +1,68 @@
+/* Tighter padding on quantity inputs for spinner panel room */
+.wl-col-quantity input.form-text {
+  padding: 5px 6px;
+}
+
+/* Orange background on changed fields */
+.rb-changed-field {
+  background-color: var(--rb-changed-bg, #fef3e2) !important;
+}
+
+/* Hide native spinners on all quantity number inputs */
+.wl-col-quantity input.form-text::-webkit-inner-spin-button,
+.wl-col-quantity input.form-text::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 2x2 spinner panel — replaces native spinners on changed fields */
+.rb-spin-panel {
+  display: none;
+  position: absolute;
+  right: 2.5px;
+  top: 1px;
+  bottom: 1px;
+  width: 28px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  background: transparent;
+  border-radius: 0;
+  overflow: hidden;
+  z-index: 100;
+}
+
+/* Show panel on hover of the containing wrapper */
+.full-width:hover .rb-spin-panel {
+  display: grid;
+}
+
+/* Active (visible) buttons get the grey background */
+.rb-spin-panel button:not(.rb-hidden) {
+  background: var(--rb-panel-btn-bg, #f0f0f0);
+}
+.rb-spin-panel button:not(.rb-hidden):hover {
+  background: var(--rb-panel-btn-hover-bg, #dddddd);
+}
+
+/* Panel buttons */
+.rb-spin-panel button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+}
+.rb-spin-panel button.rb-hidden {
+  pointer-events: none;
+  background: transparent;
+  opacity: 0;
+}
+
+/* Grid lines and border-radius on individual buttons */
+.rb-spin-panel .rb-s-up:not(.rb-hidden) { border-bottom: 0.5px solid #ccc; }
+.rb-spin-panel .rb-s-eq:not(.rb-hidden) { border-bottom: 0.5px solid #ccc; border-left: 0.5px solid #ccc; border-radius: 0 15% 0 0; }
+.rb-spin-panel .rb-s-revert:not(.rb-hidden) { border-left: 0.5px solid #ccc; border-radius: 0 0 15% 0; }

@@ -1,0 +1,63 @@
+/* Orange background on changed price fields */
+.wl-col-price .rb-price-changed {
+  background-color: var(--rb-changed-bg, #fef3e2) !important;
+}
+
+/* Hide native spinners on price inputs */
+.wl-col-price input.form-text::-webkit-inner-spin-button,
+.wl-col-price input.form-text::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* 2x2 grid panel (L-shape: up, down, revert) */
+.rb-price-panel {
+  display: none;
+  position: absolute;
+  right: 2.5px;
+  top: 1px;
+  bottom: 1px;
+  width: 28px;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  background: transparent;
+  border-radius: 0;
+  overflow: hidden;
+  z-index: 100;
+}
+
+/* Show panel on hover of the containing wrapper */
+.full-width:hover .rb-price-panel {
+  display: grid;
+}
+
+/* Active buttons get the grey background */
+.rb-price-panel button:not(.rb-hidden) {
+  background: var(--rb-panel-btn-bg, #f0f0f0);
+}
+.rb-price-panel button:not(.rb-hidden):hover {
+  background: var(--rb-panel-btn-hover-bg, #dddddd);
+}
+
+/* Panel buttons */
+.rb-price-panel button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  min-width: 0;
+  min-height: 0;
+}
+.rb-price-panel button.rb-hidden {
+  pointer-events: none;
+  background: transparent;
+  opacity: 0;
+}
+
+/* Grid lines and border-radius - matches quantity panel */
+.rb-price-panel .rb-p-up:not(.rb-hidden) { border-bottom: 0.5px solid #ccc; }
+.rb-price-panel .rb-p-down:not(.rb-hidden) { }
+.rb-price-panel .rb-p-revert:not(.rb-hidden) { border-left: 0.5px solid #ccc; border-radius: 0 0 15% 0; }

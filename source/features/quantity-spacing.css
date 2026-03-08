@@ -1,0 +1,22 @@
+/* Normalize Want:/Have: label widths so inputs line up */
+.wl-col-quantity .full-width > span:first-child,
+.wl-col-quantity .rb-change-label {
+  display: inline-block;
+  min-width: var(--rb-label-min-width, 38px);
+  text-align: right;
+}
+
+/* Reduce vertical padding to prevent input overlap */
+.wl-col-quantity input.form-text {
+  padding-top: 3px;
+  padding-bottom: 3px;
+}
+
+/* Merge Want (top) and Have (bottom) into one rounded shape */
+.wl-col-quantity .full-width:first-child input.form-text {
+  border-radius: 3px 3px 0 0;
+  border-bottom: none;
+}
+.wl-col-quantity .full-width:last-child input.form-text {
+  border-radius: 0 0 3px 3px;
+}

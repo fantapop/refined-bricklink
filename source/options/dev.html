@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Refined Bricklink — Options (dev)</title>
+  <link rel="stylesheet" href="options.css">
+  <style>
+    .dev-bar {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 8px 32px;
+      font-size: 12px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .dev-bar .dev-label {
+      font-weight: 700;
+      color: #e74c3c;
+      letter-spacing: 0.05em;
+    }
+    .dev-bar .dev-hint {
+      color: #95a5a6;
+      flex: 1;
+    }
+    .dev-bar button {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #ecf0f1;
+      padding: 3px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    .dev-bar button:hover {
+      background: rgba(255,255,255,0.22);
+    }
+    .dev-toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #27ae60;
+      color: #fff;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: opacity 0.15s, transform 0.15s;
+      pointer-events: none;
+    }
+    .dev-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .dev-error {
+      padding: 32px;
+      color: #e74c3c;
+      font-family: monospace;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="dev-bar">
+    <span class="dev-label">DEV</span>
+    <span class="dev-hint">Settings stored in localStorage — changes are instant</span>
+    <button id="dev-reset">Reset to defaults</button>
+  </div>
+
+  <div class="container">
+    <h1>Refined Bricklink</h1>
+    <p class="subtitle">Toggle UI features for bricklink.com</p>
+    <div id="features-list"></div>
+  </div>
+
+  <div class="dev-toast" id="dev-toast">Saved</div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = "rb-dev-settings";
+      let toastTimer = null;
+
+      function showToast(msg) {
+        const el = document.getElementById("dev-toast");
+        el.textContent = msg || "Saved";
+        el.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { el.classList.remove("show"); }, 1500);
+      }
+
+      // Chrome API stubs — chrome.storage.sync backed by localStorage
+      window.chrome = {
+        runtime: {
+          getManifest: null, // filled after manifest fetch below
+        },
+        storage: {
+          sync: {
+            _data: JSON.parse(localStorage.getItem(STORAGE_KEY) || "{}"),
+            get: function (defaults, cb) {
+              cb(Object.assign({}, defaults, this._data));
+            },
+            set: function (obj) {
+              Object.assign(this._data, obj);
+              localStorage.setItem(STORAGE_KEY, JSON.stringify(this._data));
+              showToast("Saved");
+            },
+          },
+        },
+      };
+
+      document.getElementById("dev-reset").addEventListener("click", function () {
+        localStorage.removeItem(STORAGE_KEY);
+        location.reload();
+      });
+
+      // Fetch the real manifest so options.js always gets the current script list
+      fetch("../manifest.json")
+        .then(function (r) { return r.json(); })
+        .then(function (manifest) {
+          chrome.runtime.getManifest = function () { return manifest; };
+
+          var s = document.createElement("script");
+          s.src = "../registry.js";
+          s.onload = function () {
+            var s2 = document.createElement("script");
+            s2.src = "options.js";
+            document.head.appendChild(s2);
+          };
+          document.head.appendChild(s);
+        })
+        .catch(function () {
+          document.getElementById("features-list").innerHTML =
+            '<div class="dev-error">' +
+            "Could not load manifest.json.<br><br>" +
+            "Open this page via the extension URL, not file://:<br>" +
+            "<code>chrome-extension://&lt;id&gt;/options/dev.html</code>" +
+            "</div>";
+        });
+    })();
+  </script>
+</body>
+</html>
