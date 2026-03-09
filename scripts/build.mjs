@@ -1,16 +1,17 @@
 #!/usr/bin/env node
-// Build script: copies source/ → build/, excluding test files, dev files,
+// Build script: copies source/ → build/source/, excluding test files, dev files,
 // and feature CSS files (which get inlined into JS); then inlines CSS into
 // any JS file that contains the /* @inline */`` marker.
 
-import { cpSync, readFileSync, writeFileSync, existsSync } from "fs";
+import { cpSync, readFileSync, writeFileSync, existsSync, mkdirSync } from "fs";
 import { resolve, dirname, basename, join } from "path";
 import { fileURLToPath } from "url";
+import { execSync } from "child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
 const src = join(root, "source");
-const dest = join(root, "build");
+const dest = join(root, "build/source");
 
 const featuresSrc = join(src, "features");
 
@@ -52,4 +53,19 @@ for (const file of readdirSync(featuresDest)) {
   inlineCSS(join(featuresDest, file), join(featuresSrc, cssFile));
 }
 
-console.log("Build complete.");
+// Package into build/out/
+const manifest = JSON.parse(readFileSync(join(src, "manifest.json"), "utf-8"));
+const version = manifest.version;
+const outDir = join(root, "build/out");
+const zipName = `refined-bricklink-v${version}.zip`;
+const zipPath = join(outDir, zipName);
+
+mkdirSync(outDir, { recursive: true });
+execSync(`find ${dest} -exec touch -t 197001010000 {} \\;`);
+execSync(`cd ${dest} && zip -r ${zipPath} .`);
+
+const sha256 = execSync(`sha256sum ${zipPath}`).toString().split(" ")[0];
+writeFileSync(`${zipPath}.sha256`, `${sha256}  ${zipName}\n`, "utf-8");
+
+console.log(`Packaged build/out/${zipName}`);
+console.log(`SHA256: ${sha256}`);
