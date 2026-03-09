@@ -1,13 +1,19 @@
 {
   "manifest_version": 3,
   "name": "Refined Bricklink",
-  "version": "0.1.71",
+  "version": "0.2.0",
   "description": "Toggleable UI features for bricklink.com",
-  "permissions": ["storage"],
-  "host_permissions": ["*://*.bricklink.com/*"],
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "*://*.bricklink.com/*"
+  ],
   "content_scripts": [
     {
-      "matches": ["*://*.bricklink.com/*"],
+      "matches": [
+        "*://*.bricklink.com/*"
+      ],
       "js": [
         "registry.js",
         "features/reverse-wanted-list.js",

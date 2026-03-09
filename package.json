@@ -1,10 +1,11 @@
 {
   "name": "refined-bricklink",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "node scripts/build.mjs",
+    "bump": "node scripts/bump-version.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:e2e": "playwright test --project=no-auth",
