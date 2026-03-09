@@ -5,3 +5,4 @@ test-results/
 playwright-report/
 graveyard/
 .claude/
+.DS_Store
