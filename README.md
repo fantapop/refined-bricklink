@@ -19,13 +19,13 @@ Inspired by [Refined GitHub](https://github.com/refined-github/refined-github). 
 
 ### Wanted List Search
 
-**Quantity Control Panel** — Adds increment/decrement buttons to quantity fields on wanted list edit pages. Highlights changed rows in orange, and lets you match Have to Want or revert to the original value with one click.
+**Quantity Control Panel** — Adds match Have↔Want and revert controls to quantity fields on wanted list edit pages. Highlights changed rows in orange.
 
-<video src="docs/screenshots/wanted-list-change-tracker.mp4" width="600" controls></video>
+<img src="docs/screenshots/wanted-list-change-tracker.gif" width="600" alt="Quantity control panel demo">
 
 <br>
 
-**Max Price Revert Button** — Adds increment/decrement and revert controls to max price fields on wanted list edit pages.
+**Max Price Revert Button** — Adds a revert control to max price fields on wanted list edit pages.
 
 <img src="docs/screenshots/max-price-revert.png" width="500" alt="Max price field with increment/decrement controls and revert tooltip">
 
@@ -45,7 +45,7 @@ Inspired by [Refined GitHub](https://github.com/refined-github/refined-github). 
 
 **Smart Wanted List Filters** — On wanted list search pages, filters the Color and Condition dropdowns to only show values that exist in your list. Automatically selects and locks the filter if all items share the same value.
 
-<video src="docs/screenshots/wanted-list-smart-filters.mp4" width="600" controls></video>
+<img src="docs/screenshots/wanted-list-smart-filters.gif" width="600" alt="Smart wanted list filters demo">
 
 ### Modals
 
