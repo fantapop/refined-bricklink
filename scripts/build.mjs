@@ -65,7 +65,5 @@ execSync(`find ${dest} -exec touch -t 197001010000 {} \\;`);
 execSync(`cd ${dest} && zip -r ${zipPath} .`);
 
 const sha256 = execSync(`sha256sum ${zipPath}`).toString().split(" ")[0];
-writeFileSync(`${zipPath}.sha256`, `${sha256}  ${zipName}\n`, "utf-8");
-
 console.log(`Packaged build/out/${zipName}`);
 console.log(`SHA256: ${sha256}`);

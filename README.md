@@ -95,13 +95,7 @@ Then load the `build/source/` folder as an unpacked extension.
 
 Releases are built automatically from tagged commits via [GitHub Actions](.github/workflows/release.yml). The version in [`source/manifest.json`](source/manifest.json) always matches the release tag.
 
-Each release includes a `.sha256` file. To verify the download hasn't been tampered with:
-
-```sh
-sha256sum -c refined-bricklink-v0.2.0.zip.sha256
-```
-
-Builds are reproducible — to verify the release zip was built from the published source, clone the repo at the matching tag and run `npm run build`. The sha256 of `build/out/refined-bricklink-v0.2.0.zip` should match the release.
+GitHub displays a SHA256 checksum for each release artifact. Builds are reproducible — to verify the release zip was built from the published source, clone the repo at the matching tag and run `npm run build`. The SHA256 of `build/out/refined-bricklink-v0.2.0.zip` should match.
 
 ---
 
