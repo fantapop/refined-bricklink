@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Refined Bricklink",
-  "version": "0.2.4",
+  "version": "0.3.0",
   "description": "Toggleable UI features for bricklink.com",
   "permissions": [
     "storage"
