@@ -21,6 +21,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Run unit tests
+        run: npx vitest run
+
       - name: Build and package extension
         run: npm run build
 
@@ -30,6 +33,9 @@ jobs:
           files: build/out/refined-bricklink-${{ github.ref_name }}.zip
           body: |
             ## Installation
+
+            **Chrome Web Store (recommended):**
+            Install directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/refined-bricklink/${{ secrets.CHROME_EXTENSION_ID }}).
 
             **From source (this release):**
             1. Download `refined-bricklink-${{ github.ref_name }}.zip` below
@@ -42,4 +48,42 @@ jobs:
             This release was built directly from the tagged source:
             [`${{ github.ref_name }}`](https://github.com/${{ github.repository }}/tree/${{ github.ref_name }})
 
-            To verify, clone the repo at that tag and run `npm run build` — the SHA256 of `build/out/refined-bricklink-${{ github.ref_name }}.zip` should match the checksum shown above.
+            To verify, clone the repo at that tag and run `npm run build` — the SHA256 of `build/out/refined-bricklink-${{ github.ref_name }}.zip` should match the checksum listed on this release.
+
+      - name: Publish to Chrome Web Store
+        env:
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+          CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
+          CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+        run: |
+          ZIP="build/out/refined-bricklink-${{ github.ref_name }}.zip"
+
+          ACCESS_TOKEN=$(curl -s -X POST https://oauth2.googleapis.com/token \
+            -d "client_id=${CHROME_CLIENT_ID}&client_secret=${CHROME_CLIENT_SECRET}&refresh_token=${CHROME_REFRESH_TOKEN}&grant_type=refresh_token" \
+            | jq -r '.access_token')
+
+          if [ -z "$ACCESS_TOKEN" ] || [ "$ACCESS_TOKEN" = "null" ]; then
+            echo "Failed to obtain access token"
+            exit 1
+          fi
+
+          UPLOAD_RESPONSE=$(curl -s -X PUT \
+            "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${CHROME_EXTENSION_ID}" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "x-goog-api-version: 2" \
+            -T "$ZIP")
+          echo "Upload response: $UPLOAD_RESPONSE"
+
+          UPLOAD_STATE=$(echo "$UPLOAD_RESPONSE" | jq -r '.uploadState')
+          if [ "$UPLOAD_STATE" != "SUCCESS" ]; then
+            echo "Upload failed"
+            exit 1
+          fi
+
+          PUBLISH_RESPONSE=$(curl -s -X POST \
+            "https://www.googleapis.com/chromewebstore/v1.1/items/${CHROME_EXTENSION_ID}/publish" \
+            -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+            -H "x-goog-api-version: 2" \
+            -H "Content-Length: 0")
+          echo "Publish response: $PUBLISH_RESPONSE"
