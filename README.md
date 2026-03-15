@@ -25,6 +25,16 @@ Adds a Download button to each row on the Wanted Lists page so you can download 
 
 <img src="docs/screenshots/wanted-list-download-buttons.png" width="600" alt="Wanted Lists page showing Download button alongside Easy Buy and Setup on each row">
 
+<br>
+
+#### Download All
+
+Adds a button next to the search bar to bulk-download all your wanted lists as a ZIP file. When the search filter is active it downloads only the matching lists. If only one list is visible it downloads that list directly as XML.
+
+<img src="docs/screenshots/wanted-list-download-all.png" width="600" alt="Wanted Lists page showing Download All button next to search bar">
+
+<img src="docs/screenshots/wanted-list-download-filtered.png" width="600" alt="Wanted Lists page showing Download (3) button when search filter is active">
+
 ### Search
 
 #### Quantity Control Panel

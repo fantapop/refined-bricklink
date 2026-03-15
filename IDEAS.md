@@ -11,8 +11,7 @@
 
 ## Wanted List – Downloads
 
-- **Download all wanted lists as a zip:** Add a button (with spinner) to bulk-download all lists as a zip file built dynamically in the browser. Could live on the Wanted Lists index page as a minimal first version, or in a dedicated tab. Lists to exclude would be configurable later.
-- **Download filtered wanted lists as a zip:** Same as above but respects the search bar on the Wanted Lists index page — only downloads the matching lists.
+- **Exclude lists from Download All:** Allow certain lists to be excluded from the Download All / Download Filtered ZIP (e.g. a "Default Wanted List" or scratch lists). Configurable via the options page.
 - **Merge wanted lists:** Download a single merged XML by combining needed quantities across multiple lists, preserving the lowest max-price per item/color combo, and noting which source lists contributed to each item. Excludable lists TBD.
 
 ## Wanted List – Other Pages
