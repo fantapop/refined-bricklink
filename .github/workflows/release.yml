@@ -45,7 +45,7 @@ jobs:
           fi
 
       - name: Create git tag
-        if: steps.check.outputs.release == 'true' && github.ref == 'refs/heads/main'
+        if: steps.check.outputs.release == 'true' && github.ref == 'refs/heads/main' && github.event_name == 'push'
         run: |
           git tag "${{ steps.tag.outputs.name }}"
           git push origin "${{ steps.tag.outputs.name }}"
