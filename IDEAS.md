@@ -1,0 +1,29 @@
+# Ideas
+
+## Maintenance
+- During maintenance, disable links/buttons with JavaScript so the user stays on the same page rather than hitting a dead end. (`maintenance-link-guard` exists but is currently hidden from users because it wasn't working reliably — this would be part of fixing/replacing it.)
+
+## Wanted List – Edit Page
+- Part search filters should be hidden when there are no applicable values (e.g. hide color filter if all items share one color). Related to `wanted-list-smart-filters`.
+- Default to 100 items per page.
+- Save state before saving (snapshot for rollback/protection).
+- Modification history with undo/redo (forward and backward buttons).
+
+## Wanted List – Downloads
+
+- **Download all wanted lists as a zip:** Add a button (with spinner) to bulk-download all lists as a zip file built dynamically in the browser. Could live on the Wanted Lists index page as a minimal first version, or in a dedicated tab. Lists to exclude would be configurable later.
+- **Download filtered wanted lists as a zip:** Same as above but respects the search bar on the Wanted Lists index page — only downloads the matching lists.
+- **Merge wanted lists:** Download a single merged XML by combining needed quantities across multiple lists, preserving the lowest max-price per item/color combo, and noting which source lists contributed to each item. Excludable lists TBD.
+
+## Wanted List – Other Pages
+- Add image and link to a set on the wanted list page when the list title contains a set number.
+- Associate a set with a wanted list so the set picture is shown.
+- Reverse sort order of wanted lists on the "Upload to Wanted List" page (there are two lists there).
+- Move "Create New Wanted List" to the top of the list.
+
+## Search
+- Allow searching for sets by a combination of parts (e.g. "4 of part A and 3 of part B").
+
+## General UI
+- Pressing Esc while a modal is open should close it.
+- Add an option for a larger page size.
