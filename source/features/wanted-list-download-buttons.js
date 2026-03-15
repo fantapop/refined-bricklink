@@ -9,6 +9,8 @@
     description:
       "Adds a Download button to each row on the Wanted Lists page so you can download a list without clicking into it.",
     enabledByDefault: true,
+    section: "Wanted Lists",
+    docsUrl: "https://github.com/fantapop/refined-bricklink#download-buttons",
 
     init() {
       if (!window.location.pathname.includes("/v2/wanted/list.page")) return;

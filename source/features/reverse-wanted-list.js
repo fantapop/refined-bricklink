@@ -10,6 +10,8 @@
     description:
       "Reverses the wanted list order in the 'Add to Wanted List' modal so the most recently created lists appear first.",
     enabledByDefault: true,
+    section: "Modals",
+    docsUrl: "https://github.com/fantapop/refined-bricklink#reverse-wanted-list-order",
 
     init() {
       // Stash the original order once so we can always derive reversed order

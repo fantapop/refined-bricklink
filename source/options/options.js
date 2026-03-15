@@ -22,8 +22,30 @@
       }
     }
 
+    const SECTION_ORDER = ["Wanted Lists", "Upload", "Part Out", "Search", "Buy", "Modals"];
+
+    // Group features by section, preserving manifest order within each section
+    const sections = {};
+    for (const feature of features) {
+      const s = feature.section || "Other";
+      if (!sections[s]) sections[s] = [];
+      sections[s].push(feature);
+    }
+
+    // Only include sections that have features, in the defined order
+    const orderedSections = SECTION_ORDER.filter((s) => sections[s]);
+    for (const s of Object.keys(sections)) {
+      if (!orderedSections.includes(s)) orderedSections.push(s);
+    }
+
     chrome.storage.sync.get(defaults, function (settings) {
-      for (const feature of features) {
+      for (const sectionName of orderedSections) {
+        const heading = document.createElement("h2");
+        heading.className = "section-heading";
+        heading.textContent = sectionName;
+        container.appendChild(heading);
+
+        for (const feature of sections[sectionName]) {
         const card = document.createElement("div");
         card.className = "feature-card";
 
@@ -34,10 +56,25 @@
         const info = document.createElement("div");
         info.className = "feature-info";
 
-        const name = document.createElement("div");
-        name.className = "feature-name";
-        name.textContent = feature.name;
-        info.appendChild(name);
+        const nameRow = document.createElement("div");
+        nameRow.className = "feature-name";
+
+        const nameText = document.createElement("span");
+        nameText.textContent = feature.name;
+        nameRow.appendChild(nameText);
+
+        if (feature.docsUrl) {
+          const docsLink = document.createElement("a");
+          docsLink.className = "feature-docs-link";
+          docsLink.href = feature.docsUrl;
+          docsLink.target = "_blank";
+          docsLink.rel = "noopener";
+          docsLink.textContent = "?";
+          docsLink.title = "View documentation";
+          nameRow.appendChild(docsLink);
+        }
+
+        info.appendChild(nameRow);
 
         const desc = document.createElement("div");
         desc.className = "feature-desc";
@@ -145,7 +182,8 @@
         }
 
         container.appendChild(card);
-      }
+        } // end feature loop
+      } // end section loop
     });
   }
 

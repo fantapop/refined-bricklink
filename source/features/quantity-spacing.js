@@ -8,6 +8,8 @@
     description:
       "Fixes misaligned Want/Have input fields on wanted list edit pages. Normalizes label widths, reduces padding, and merges the two inputs into one rounded shape.",
     enabledByDefault: true,
+    section: "Search",
+    docsUrl: "https://github.com/fantapop/refined-bricklink#quantity-style-fixes",
     cssVars: [
       {
         name: "--rb-label-min-width",

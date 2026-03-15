@@ -7,6 +7,8 @@
     description:
       "Shows a browser warning when navigating away from a wanted list edit page with unsaved changes.",
     enabledByDefault: true,
+    section: "Search",
+    docsUrl: "https://github.com/fantapop/refined-bricklink#unsaved-changes-warning",
 
     init: function () {
       var banner = document.getElementById("wanted-save-banner");

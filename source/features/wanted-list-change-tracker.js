@@ -177,6 +177,8 @@
     description:
       "Adds a control panel to quantity fields on wanted list edit pages. Highlights changes, revert to original values, or match Have to Want with one click.",
     enabledByDefault: true,
+    section: "Search",
+    docsUrl: "https://github.com/fantapop/refined-bricklink#quantity-control-panel",
     cssVars: [
       {
         name: "--rb-changed-bg",

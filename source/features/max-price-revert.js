@@ -144,6 +144,8 @@
     description:
       "Adds increment/decrement and revert controls to max price fields on wanted list edit pages.",
     enabledByDefault: true,
+    section: "Search",
+    docsUrl: "https://github.com/fantapop/refined-bricklink#max-price-revert-button",
 
     init: function () {
       var table = document.querySelector(".table-wl-edit");

@@ -246,6 +246,8 @@
     description:
       "Filters the Color and Condition dropdowns on wanted list search pages to show only values that exist in your wanted list. Auto-selects and disables if all items share the same value.",
     enabledByDefault: true,
+    section: "Search",
+    docsUrl: "https://github.com/fantapop/refined-bricklink#smart-wanted-list-filters",
 
     init: function () {
       console.log("[wanted-list-smart-filters] init called, URL:", window.location.href);

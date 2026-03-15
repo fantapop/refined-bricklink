@@ -161,6 +161,8 @@
     description:
       "Shows a live summary of changed fields in the save banner on wanted list edit pages.",
     enabledByDefault: true,
+    section: "Search",
+    docsUrl: "https://github.com/fantapop/refined-bricklink#edit-summary-banner",
     cssVars: [
       {
         name: "--rb-summary-popover-width",

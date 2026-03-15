@@ -27,6 +27,21 @@ h1 {
   font-size: 14px;
 }
 
+/* ── Section heading ──────────────────────────────────────────────────── */
+
+.section-heading {
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #999;
+  margin: 24px 0 8px;
+}
+
+.section-heading:first-child {
+  margin-top: 0;
+}
+
 /* ── Feature card ─────────────────────────────────────────────────────── */
 
 .feature-card {
@@ -52,6 +67,30 @@ h1 {
   font-weight: 600;
   font-size: 15px;
   margin-bottom: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.feature-docs-link {
+  font-size: 11px;
+  font-weight: 600;
+  color: #aaa;
+  background: #f0f0f0;
+  border-radius: 50%;
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.feature-docs-link:hover {
+  background: #4a90d9;
+  color: #fff;
 }
 
 .feature-desc {
