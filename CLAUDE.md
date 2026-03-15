@@ -30,12 +30,13 @@ Features register themselves: `RefinedBricklink.features.push(featureDef);`
 
 ### Making Changes
 1. Edit code in `source/features/`
-2. **Bump version** in `source/manifest.json` (patch version)
-3. Run `npx vitest run` to verify tests pass
-4. Run `npm run build` to sync changes to `build/source/`
-5. Reload extension on `chrome://extensions` (load from `build/source/`)
-6. Refresh the BrickLink page
-7. Verify reload by checking `rb-version` meta tag matches manifest version
+2. Run `npx vitest run` to verify tests pass
+3. Run `npm run build` to sync changes to `build/source/`
+4. Reload extension on `chrome://extensions` (load from `build/source/`)
+5. Refresh the BrickLink page
+6. Verify reload by checking the `rb-version` meta tag — it shows `<version>+<timestamp>` (e.g. `0.2.4+20260315-1342`); the timestamp changes on every build
+
+**Note:** Only bump `source/manifest.json` version when cutting a release, not during routine development.
 
 ### Testing
 - **Unit tests:** `npx vitest run` (fast, no browser needed)
@@ -117,9 +118,8 @@ Tightens padding on quantity input fields to make room for control panels.
 ## Common Issues
 
 ### "It's not working after reload"
-- Did you bump the version in `source/manifest.json` and run `npm run build`?
-- Did you reload the extension AND refresh the page?
-- Check `rb-version` meta tag matches manifest version
+- Did you run `npm run build` and reload the extension AND refresh the page?
+- Check the `rb-version` meta tag — the timestamp after `+` should match your latest build
 
 ### "MutationObserver not firing"
 - React might be setting properties without DOM mutations

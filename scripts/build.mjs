@@ -53,6 +53,21 @@ for (const file of readdirSync(featuresDest)) {
   inlineCSS(join(featuresDest, file), join(featuresSrc, cssFile));
 }
 
+// Inject build timestamp into main.js in the built copy so the rb-version
+// meta tag reflects when the build was made, without touching manifest.json.
+const buildStamp = new Date()
+  .toISOString()
+  .replace(/[^0-9]/g, "")
+  .replace(/^(\d{8})(\d{4}).*$/, "$1-$2"); // YYYYMMDDHHmm → YYYYMMDD-HHmm
+const mainJsBuildPath = join(dest, "main.js");
+let mainJsContent = readFileSync(mainJsBuildPath, "utf-8");
+mainJsContent = mainJsContent.replace(
+  "chrome.runtime.getManifest().version",
+  `chrome.runtime.getManifest().version + "+${buildStamp}"`
+);
+writeFileSync(mainJsBuildPath, mainJsContent, "utf-8");
+console.log(`  stamped build time ${buildStamp} → main.js`);
+
 // Package into build/out/
 const manifest = JSON.parse(readFileSync(join(src, "manifest.json"), "utf-8"));
 const version = manifest.version;

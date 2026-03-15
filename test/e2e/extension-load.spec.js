@@ -30,7 +30,8 @@ test.describe("Extension loading", () => {
       return meta ? meta.content : null;
     });
 
-    expect(pageVersion).toBe(version);
+    // rb-version is the manifest version + a build timestamp suffix (e.g. "0.2.4+20260315-1342")
+    expect(pageVersion).toMatch(new RegExp("^" + version.replace(/\./g, "\\.") + "(\\+\\d{8}-\\d{4})?$"));
     await page.close();
   });
 });
