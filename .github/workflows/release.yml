@@ -2,8 +2,11 @@ name: Release
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*'
+  workflow_dispatch:
 
 jobs:
   release:
@@ -13,24 +16,63 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Determine if release needed
+        id: check
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* || "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "release=true" >> $GITHUB_OUTPUT
+          else
+            CURRENT=$(jq -r '.version' source/manifest.json)
+            PREVIOUS=$(git show HEAD~1:source/manifest.json | jq -r '.version')
+            if [ "$CURRENT" != "$PREVIOUS" ]; then
+              echo "release=true" >> $GITHUB_OUTPUT
+            else
+              echo "release=false" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Get release tag
+        id: tag
+        if: steps.check.outputs.release == 'true'
+        run: |
+          if [[ "${{ github.ref }}" == refs/tags/* ]]; then
+            echo "name=${{ github.ref_name }}" >> $GITHUB_OUTPUT
+          else
+            echo "name=v$(jq -r '.version' source/manifest.json)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Create git tag
+        if: steps.check.outputs.release == 'true' && github.ref == 'refs/heads/main'
+        run: |
+          git tag "${{ steps.tag.outputs.name }}"
+          git push origin "${{ steps.tag.outputs.name }}"
 
       - uses: actions/setup-node@v4
+        if: steps.check.outputs.release == 'true'
         with:
           node-version: '20'
 
       - name: Install dependencies
+        if: steps.check.outputs.release == 'true'
         run: npm ci
 
       - name: Run unit tests
+        if: steps.check.outputs.release == 'true'
         run: npx vitest run
 
       - name: Build and package extension
+        if: steps.check.outputs.release == 'true'
         run: npm run build
 
       - name: Create GitHub Release
+        if: steps.check.outputs.release == 'true'
         uses: softprops/action-gh-release@v2
         with:
-          files: build/out/refined-bricklink-${{ github.ref_name }}.zip
+          tag_name: ${{ steps.tag.outputs.name }}
+          files: build/out/refined-bricklink-${{ steps.tag.outputs.name }}.zip
           generate_release_notes: true
           body: |
             ## Installation
@@ -39,7 +81,7 @@ jobs:
             Install directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/refined-bricklink/${{ secrets.CHROME_EXTENSION_ID }}).
 
             **From source (this release):**
-            1. Download `refined-bricklink-${{ github.ref_name }}.zip` below
+            1. Download `refined-bricklink-${{ steps.tag.outputs.name }}.zip` below
             2. Unzip it
             3. Go to `chrome://extensions`, enable Developer mode
             4. Click **Load unpacked** and select the unzipped folder
@@ -47,18 +89,19 @@ jobs:
             ## Source verification
 
             This release was built directly from the tagged source:
-            [`${{ github.ref_name }}`](https://github.com/${{ github.repository }}/tree/${{ github.ref_name }})
+            [`${{ steps.tag.outputs.name }}`](https://github.com/${{ github.repository }}/tree/${{ steps.tag.outputs.name }})
 
-            To verify, clone the repo at that tag and run `npm run build` — the SHA256 of `build/out/refined-bricklink-${{ github.ref_name }}.zip` should match the checksum listed on this release.
+            To verify, clone the repo at that tag and run `npm run build` — the SHA256 of `build/out/refined-bricklink-${{ steps.tag.outputs.name }}.zip` should match the checksum listed on this release.
 
       - name: Publish to Chrome Web Store
+        if: steps.check.outputs.release == 'true'
         env:
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
           CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
           CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
         run: |
-          ZIP="build/out/refined-bricklink-${{ github.ref_name }}.zip"
+          ZIP="build/out/refined-bricklink-${{ steps.tag.outputs.name }}.zip"
 
           ACCESS_TOKEN=$(curl -s -X POST https://oauth2.googleapis.com/token \
             -d "client_id=${CHROME_CLIENT_ID}&client_secret=${CHROME_CLIENT_SECRET}&refresh_token=${CHROME_REFRESH_TOKEN}&grant_type=refresh_token" \
