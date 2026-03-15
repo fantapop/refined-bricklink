@@ -17,6 +17,14 @@ Inspired by [Refined GitHub](https://github.com/refined-github/refined-github). 
 
 ## Features
 
+### Wanted Lists
+
+**Download Buttons** — Adds a Download button to each row on the Wanted Lists page so you can download a list without clicking into it.
+
+<img src="docs/screenshots/wanted-list-download-buttons.png" width="600" alt="Wanted Lists page showing Download button alongside Easy Buy and Setup on each row">
+
+<br>
+
 ### Wanted List Search
 
 **Quantity Control Panel** — Adds match Have↔Want and revert controls to quantity fields on wanted list edit pages. Highlights changed rows in orange.

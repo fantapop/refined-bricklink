@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Refined Bricklink",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Toggleable UI features for bricklink.com",
   "permissions": [
     "storage"
@@ -23,6 +23,7 @@
         "features/edit-summary-banner.js",
         "features/max-price-revert.js",
         "features/wanted-list-smart-filters.js",
+        "features/wanted-list-download-buttons.js",
         "main.js"
       ],
       "run_at": "document_idle"
