@@ -78,7 +78,7 @@ jobs:
             ## Installation
 
             **Chrome Web Store (recommended):**
-            Install directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/refined-bricklink/${{ secrets.CHROME_EXTENSION_ID }}).
+            Install directly from the [Chrome Web Store](https://chromewebstore.google.com/detail/refined-bricklink/${{ vars.CHROME_EXTENSION_ID }}).
 
             **From source (this release):**
             1. Download `refined-bricklink-${{ steps.tag.outputs.name }}.zip` below
@@ -99,8 +99,8 @@ jobs:
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
           CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
           CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
-          CHROME_PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
-          CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
+          CHROME_PUBLISHER_ID: ${{ vars.CHROME_PUBLISHER_ID }}
+          CHROME_EXTENSION_ID: ${{ vars.CHROME_EXTENSION_ID }}
         run: |
           ZIP="build/out/refined-bricklink-${{ steps.tag.outputs.name }}.zip"
 
