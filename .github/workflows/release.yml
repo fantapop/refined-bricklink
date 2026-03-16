@@ -119,8 +119,8 @@ jobs:
             -T "$ZIP")
           echo "Upload response: $UPLOAD_RESPONSE"
 
-          UPLOAD_STATE=$(echo "$UPLOAD_RESPONSE" | jq -r '.state')
-          if [ "$UPLOAD_STATE" != "ACTIVE" ]; then
+          UPLOAD_STATE=$(echo "$UPLOAD_RESPONSE" | jq -r '.uploadState')
+          if [ "$UPLOAD_STATE" != "SUCCEEDED" ]; then
             echo "Upload failed"
             exit 1
           fi
