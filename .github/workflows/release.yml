@@ -99,6 +99,7 @@ jobs:
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
           CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}
           CHROME_REFRESH_TOKEN: ${{ secrets.CHROME_REFRESH_TOKEN }}
+          CHROME_PUBLISHER_ID: ${{ secrets.CHROME_PUBLISHER_ID }}
           CHROME_EXTENSION_ID: ${{ secrets.CHROME_EXTENSION_ID }}
         run: |
           ZIP="build/out/refined-bricklink-${{ steps.tag.outputs.name }}.zip"
@@ -112,22 +113,20 @@ jobs:
             exit 1
           fi
 
-          UPLOAD_RESPONSE=$(curl -s -X PUT \
-            "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${CHROME_EXTENSION_ID}" \
+          UPLOAD_RESPONSE=$(curl -s -X POST \
+            "https://chromewebstore.googleapis.com/upload/v2/publishers/${CHROME_PUBLISHER_ID}/items/${CHROME_EXTENSION_ID}:upload" \
             -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-            -H "x-goog-api-version: 2" \
             -T "$ZIP")
           echo "Upload response: $UPLOAD_RESPONSE"
 
-          UPLOAD_STATE=$(echo "$UPLOAD_RESPONSE" | jq -r '.uploadState')
-          if [ "$UPLOAD_STATE" != "SUCCESS" ]; then
+          UPLOAD_STATE=$(echo "$UPLOAD_RESPONSE" | jq -r '.state')
+          if [ "$UPLOAD_STATE" != "ACTIVE" ]; then
             echo "Upload failed"
             exit 1
           fi
 
           PUBLISH_RESPONSE=$(curl -s -X POST \
-            "https://www.googleapis.com/chromewebstore/v1.1/items/${CHROME_EXTENSION_ID}/publish" \
+            "https://chromewebstore.googleapis.com/v2/publishers/${CHROME_PUBLISHER_ID}/items/${CHROME_EXTENSION_ID}:publish" \
             -H "Authorization: Bearer ${ACCESS_TOKEN}" \
-            -H "x-goog-api-version: 2" \
             -H "Content-Length: 0")
           echo "Publish response: $PUBLISH_RESPONSE"
