@@ -85,6 +85,14 @@ Tightens padding on quantity input fields to make room for control panels and re
 |--------|-------|
 | <img src="docs/screenshots/quantity-spacing-before.png" width="200" alt="Before: two separate rounded input boxes"> | <img src="docs/screenshots/quantity-spacing-after.png" width="200" alt="After: merged input with orange highlight"> |
 
+#### Add from Wanted Lists
+
+Adds an "Add Lists" button to the wanted list search page toolbar. Opens a modal to select other wanted lists, preview merged items, and upload them into the current list. Supports filtering by item type, "unfulfilled only" mode, and optionally appends the source list name to remarks.
+
+<img src="docs/screenshots/add-lists-button.png" width="600" alt="Wanted list toolbar showing the Add Lists button next to Add Item">
+
+<img src="docs/screenshots/add-lists-modal.png" width="600" alt="Add Lists modal showing list picker, item type filters, preview pane, and Add Items button">
+
 ### Modals
 
 #### Reverse Wanted List Order

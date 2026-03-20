@@ -5,7 +5,7 @@
 import { chromium } from "@playwright/test";
 import path from "path";
 
-export const extensionPath = path.resolve(import.meta.dirname, "../../../source");
+export const extensionPath = path.resolve(import.meta.dirname, "../../../build/source");
 export const userDataDir = path.resolve(
   import.meta.dirname,
   "../../.auth/chrome-profile"
