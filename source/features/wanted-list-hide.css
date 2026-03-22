@@ -1,0 +1,45 @@
+/* ── "Show hidden" toggle in table header ── */
+
+/* Push toggle to the right inside the last th */
+.rb-hide-th-toggle {
+  float: right;
+  line-height: 1;
+}
+
+/* Override .bl-3 label (display:block) and ensure vertical centering */
+.rb-hide-toggle {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px;
+  font-size: 12px;
+  font-family: LatoWeb, "Helvetica Neue", Helvetica, Arial, serif;
+  color: #555;
+  cursor: pointer;
+  user-select: none;
+  line-height: 1;
+  vertical-align: middle;
+}
+
+/* "Hide / Unhide" button injected in Setup modal */
+.rb-hide-btn {
+  margin-left: 20px !important;
+}
+
+/* "Show hidden" toggle on upload page */
+.rb-upload-show-hidden {
+  margin-top: 6px;
+}
+
+/* Shrink padding on buttons in the search bar row so "Visible (N)" fits */
+.search-group .bl-btn-search,
+.search-group ~ .rb-dl-all-btn,
+.search-group ~ label.bl-btn {
+  padding-left: 7px !important;
+  padding-right: 7px !important;
+}
+
+/* Override .bl-3 .bl-btn-view-switch .bl-btn which sets 10px */
+.bl-btn-view-switch .bl-btn {
+  padding-left: 7px !important;
+  padding-right: 7px !important;
+}

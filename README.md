@@ -19,6 +19,16 @@ Inspired by [Refined GitHub](https://github.com/refined-github/refined-github). 
 
 ### Wanted Lists
 
+#### Hideable Wanted Lists
+
+Hides wanted lists whose names end with a configurable suffix (default: ` [x]`) from all views — the management page, upload dropdown, and "Add to Wanted List" modal. A **Hide** button is injected into the Setup modal so you can hide or unhide a list without manually editing its name. A **Show hidden** checkbox in the table header lets you reveal hidden lists when needed.
+
+<img src="docs/screenshots/wanted-list-hide-btn.png" width="500" alt="Setup wanted list modal showing the Hide button next to Delete">
+
+<img src="docs/screenshots/wanted-list-hide-toggle.png" width="600" alt="Wanted Lists table header showing the Show hidden checkbox">
+
+<br>
+
 #### Download Buttons
 
 Adds a Download button to each row on the Wanted Lists page so you can download a list without clicking into it.

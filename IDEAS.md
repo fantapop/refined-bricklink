@@ -9,14 +9,10 @@
 - Save state before saving (snapshot for rollback/protection).
 - Modification history with undo/redo (forward and backward buttons).
 
-## Wanted List – Downloads
-
-- **Exclude lists from Download All:** Allow certain lists to be excluded from the Download All / Download Filtered ZIP (e.g. a "Default Wanted List" or scratch lists). Configurable via the options page.
-- **Merge wanted lists:** Download a single merged XML by combining needed quantities across multiple lists, preserving the lowest max-price per item/color combo, and noting which source lists contributed to each item. Excludable lists TBD.
 
 ## Wanted List – Other Pages
 - Add image and link to a set on the wanted list page when the list title contains a set number.
-- Associate a set with a wanted list so the set picture is shown.
+- Associate a set with a wanted list so the set picture is shown. we might be able to use this endpoint: https://www.bricklink.com/ajax/clone/wanted/addinfo.ajax?itemType=S&catID=609.  I dont' see a way to look up by set number.  If we had the category we could look up all the sets in that cat.
 - Reverse sort order of wanted lists on the "Upload to Wanted List" page (there are two lists there).
 - Move "Create New Wanted List" to the top of the list.
 

@@ -52,6 +52,17 @@
           return posA - posB;
         });
 
+        // Hide [x] lists from the modal (respected by wanted-list-hide feature)
+        const hideEnabled = document.body.classList.contains("rb-hide-enabled");
+        const showHidden = document.body.classList.contains("rb-show-hidden");
+        for (const btn of buttons) {
+          const btnName = btn.querySelector(".wl-search-list__name")?.textContent?.trim() || "";
+          btn.style.display =
+            hideEnabled && !showHidden && RefinedBricklink.isHidden(btnName)
+              ? "none"
+              : "";
+        }
+
         // Pause observer while we mutate to avoid infinite loop
         if (containerObserver) containerObserver.disconnect();
         for (const btn of buttons) {

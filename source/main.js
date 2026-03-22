@@ -14,6 +14,9 @@
     for (const v of (feature.cssVars || [])) {
       defaults[v.name] = v.default;
     }
+    for (const s of (feature.settings || [])) {
+      defaults[s.name] = s.default;
+    }
   }
 
   function initFeatures(settings) {

@@ -1,5 +1,6 @@
 (function () {
   var observer = null;
+  var bodyObserver = null;
   var styleEl = null;
   var isWiringUp = false;
 
@@ -30,6 +31,8 @@
         const rows = Array.from(table.querySelectorAll("tr")).filter((r) =>
           r.querySelector("td")
         );
+        const hideEnabled = document.body.classList.contains("rb-hide-enabled");
+        const showHidden = document.body.classList.contains("rb-show-hidden");
         for (const row of rows) {
           if (row.querySelector(".rb-dl-btn")) continue;
 
@@ -41,6 +44,7 @@
           const id = params.get("wantedMoreID");
           const name = link.textContent.trim();
           if (!id) continue;
+          if (hideEnabled && !showHidden && RefinedBricklink.isHidden(name)) continue;
 
           const actionCell = row.querySelector("td.no-break");
           if (!actionCell) continue;
@@ -61,12 +65,23 @@
         childList: true,
         subtree: true,
       });
+
+      // Re-evaluate when wanted-list-hide changes show-hidden state
+      bodyObserver = new MutationObserver(addButtons);
+      bodyObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
     },
 
     destroy() {
       if (observer) {
         observer.disconnect();
         observer = null;
+      }
+      if (bodyObserver) {
+        bodyObserver.disconnect();
+        bodyObserver = null;
       }
       if (styleEl) {
         styleEl.remove();

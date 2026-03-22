@@ -71,6 +71,15 @@ console.log(`  stamped build time ${buildStamp} → main.js`);
 // Package into build/out/
 const manifest = JSON.parse(readFileSync(join(src, "manifest.json"), "utf-8"));
 const version = manifest.version;
+
+// Keep package.json version in sync with manifest.json
+const pkgPath = join(root, "package.json");
+const pkg = JSON.parse(readFileSync(pkgPath, "utf-8"));
+if (pkg.version !== version) {
+  pkg.version = version;
+  writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
+  console.log(`  synced package.json version → ${version}`);
+}
 const outDir = join(root, "build/out");
 const zipName = `refined-bricklink-v${version}.zip`;
 const zipPath = join(outDir, zipName);

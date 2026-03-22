@@ -433,9 +433,13 @@
 
     var currentId = getWantedMoreID();
     var wlJson = parseWlJson();
-    var lists = ((wlJson && wlJson.lists) || []).filter(
-      function (l) { return l.id !== currentId; }
-    );
+    var hideEnabled = document.body.classList.contains("rb-hide-enabled");
+    var showHidden = document.body.classList.contains("rb-show-hidden");
+    var lists = ((wlJson && wlJson.lists) || []).filter(function (l) {
+      if (l.id === currentId) return false;
+      if (hideEnabled && !showHidden && RefinedBricklink.isHidden(l.name)) return false;
+      return true;
+    });
     var listName = wlJson && wlJson.wantedListInfo ? wlJson.wantedListInfo.name : "";
 
     var typeCheckboxes = ITEM_TYPES.map(function (t) {

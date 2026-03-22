@@ -16,6 +16,7 @@
       ],
       "js": [
         "registry.js",
+        "features/wanted-list-hide.js",
         "features/reverse-wanted-list.js",
         "features/quantity-spacing.js",
         "features/wanted-list-change-tracker.js",

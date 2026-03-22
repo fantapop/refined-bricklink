@@ -1,5 +1,6 @@
 (function () {
   var observer = null;
+  var bodyObserver = null;
   var styleEl = null;
   var archiveBtn = null;
   var onInputHandler = null;
@@ -131,9 +132,13 @@
   function getVisibleLists() {
     var table = document.querySelector("table.wl-overview-list-table:not(.compact)");
     if (!table) return [];
+    var hideEnabled = document.body.classList.contains("rb-hide-enabled");
+    var showHidden = document.body.classList.contains("rb-show-hidden");
     return Array.from(table.querySelectorAll("tr"))
       .filter(function (r) {
-        return r.querySelector("td");
+        if (!r.querySelector("td")) return false;
+        if (hideEnabled && !showHidden && r.dataset.rbHidden === "true") return false;
+        return true;
       })
       .map(function (row) {
         var link = row.querySelector("a");
@@ -157,7 +162,19 @@
     var labelEl = archiveBtn.querySelector(".rb-dl-all-label");
     if (!labelEl) return;
     var lists = getVisibleLists();
-    var text = isFiltered() ? "(" + lists.length + ")" : "All";
+    var filtered = isFiltered();
+    var hasHiddenLists = document.body.classList.contains("rb-has-hidden-lists");
+    var showHidden = document.body.classList.contains("rb-show-hidden");
+    var text;
+    if (filtered) {
+      text = "(" + lists.length + ")";
+    } else if (hasHiddenLists && !showHidden) {
+      text = "Visible (" + lists.length + ")";
+    } else if (hasHiddenLists && showHidden) {
+      text = "All (" + lists.length + ")";
+    } else {
+      text = "All";
+    }
     if (text !== lastBtnText) {
       lastBtnText = text;
       labelEl.textContent = text;
@@ -289,12 +306,25 @@
         if (e.target.classList.contains("search-query")) updateButton();
       };
       document.addEventListener("input", onInputHandler);
+
+      // Update button label when wanted-list-hide changes body classes
+      bodyObserver = new MutationObserver(function () {
+        updateButton();
+      });
+      bodyObserver.observe(document.body, {
+        attributes: true,
+        attributeFilter: ["class"],
+      });
     },
 
     destroy() {
       if (observer) {
         observer.disconnect();
         observer = null;
+      }
+      if (bodyObserver) {
+        bodyObserver.disconnect();
+        bodyObserver = null;
       }
       if (styleEl) {
         styleEl.remove();

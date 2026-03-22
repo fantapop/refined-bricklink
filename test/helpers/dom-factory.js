@@ -119,6 +119,88 @@ export function createLink(href, text) {
 }
 
 /**
+ * Creates a wanted lists index table WITH a header row (th elements).
+ * Needed for testing toggle insertion which requires th elements.
+ * Each list = { id, name }
+ */
+export function createWantedListsIndexTableWithHeader(lists) {
+  const table = document.createElement("table");
+  table.className = "wl-overview-list-table";
+
+  // Header row with th elements (last th is the actions column)
+  const thead = document.createElement("thead");
+  const headerRow = document.createElement("tr");
+  for (const label of ["Name", "Items", "Progress", "Actions"]) {
+    const th = document.createElement("th");
+    th.textContent = label;
+    headerRow.appendChild(th);
+  }
+  thead.appendChild(headerRow);
+  table.appendChild(thead);
+
+  for (const list of lists) {
+    const tr = document.createElement("tr");
+
+    const nameTd = document.createElement("td");
+    const link = document.createElement("a");
+    link.href = `/v2/wanted/edit.page?wantedMoreID=${list.id}`;
+    link.textContent = list.name;
+    nameTd.appendChild(link);
+    tr.appendChild(nameTd);
+
+    const itemsTd = document.createElement("td");
+    itemsTd.textContent = "0";
+    tr.appendChild(itemsTd);
+
+    const progressTd = document.createElement("td");
+    progressTd.textContent = "0%";
+    tr.appendChild(progressTd);
+
+    const actionsTd = document.createElement("td");
+    const setup = document.createElement("button");
+    setup.textContent = "Setup";
+    actionsTd.appendChild(setup);
+    tr.appendChild(actionsTd);
+
+    table.appendChild(tr);
+  }
+
+  return table;
+}
+
+/**
+ * Creates a .wl-edit-modal-container with a name input and modal footer.
+ * Used to test Setup modal button injection.
+ */
+export function createWantedListSetupModal(name) {
+  const container = document.createElement("div");
+  container.className = "wl-edit-modal-container";
+
+  const body = document.createElement("div");
+  body.className = "modal-body";
+  const input = document.createElement("input");
+  input.className = "form-text";
+  input.value = name;
+  body.appendChild(input);
+  container.appendChild(body);
+
+  const footer = document.createElement("div");
+  footer.className = "modal-footer";
+  const deleteBtn = document.createElement("button");
+  deleteBtn.textContent = "Delete";
+  footer.appendChild(deleteBtn);
+  const cancelBtn = document.createElement("button");
+  cancelBtn.textContent = "Cancel";
+  footer.appendChild(cancelBtn);
+  const saveBtn = document.createElement("button");
+  saveBtn.textContent = "Save";
+  footer.appendChild(saveBtn);
+  container.appendChild(footer);
+
+  return container;
+}
+
+/**
  * Creates a wanted list edit table with rows of editable fields.
  * Each row = { want, have, price, condition, remarks, notify }
  */

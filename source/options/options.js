@@ -13,12 +13,15 @@
   function onAllLoaded() {
     const features = RefinedBricklink.features;
 
-    // Build defaults for feature toggles and all css vars in one pass
+    // Build defaults for feature toggles, css vars, and settings in one pass
     const defaults = {};
     for (const feature of features) {
       defaults[feature.id] = feature.enabledByDefault;
       for (const v of (feature.cssVars || [])) {
         defaults[v.name] = v.default;
+      }
+      for (const s of (feature.settings || [])) {
+        defaults[s.name] = s.default;
       }
     }
 
@@ -86,11 +89,12 @@
         const actions = document.createElement("div");
         actions.className = "feature-actions";
 
-        // ── Customize button (only for features with cssVars) ─────────
+        // ── Customize button (for features with cssVars or settings) ──
         const cardVars = feature.cssVars || [];
+        const cardSettings = feature.settings || [];
         let varsSection = null;
 
-        if (cardVars.length > 0) {
+        if (cardVars.length > 0 || cardSettings.length > 0) {
           varsSection = document.createElement("div");
           varsSection.className = "feature-vars";
           varsSection.hidden = true;
@@ -104,6 +108,57 @@
             customizeBtn.classList.toggle("is-open", opening);
           });
           actions.appendChild(customizeBtn);
+
+          // ── Settings rows ─────────────────────────────────────────
+          for (const s of cardSettings) {
+            if (s.type !== "boolean" && s.type !== "text") continue;
+            const row = document.createElement("div");
+            row.className = "style-row";
+
+            const rowInfo = document.createElement("div");
+            rowInfo.className = "style-info";
+
+            const label = document.createElement("label");
+            label.className = "style-label";
+            label.textContent = s.label;
+            rowInfo.appendChild(label);
+
+            const rowDesc = document.createElement("div");
+            rowDesc.className = "style-desc";
+            rowDesc.textContent = s.description;
+            rowInfo.appendChild(rowDesc);
+
+            row.appendChild(rowInfo);
+
+            if (s.type === "boolean") {
+              const toggleLabel = document.createElement("label");
+              toggleLabel.className = "toggle";
+
+              const scb = document.createElement("input");
+              scb.type = "checkbox";
+              scb.checked = !!settings[s.name];
+              scb.addEventListener("change", function () {
+                chrome.storage.sync.set({ [s.name]: scb.checked });
+              });
+
+              const slider = document.createElement("span");
+              slider.className = "slider";
+              toggleLabel.appendChild(scb);
+              toggleLabel.appendChild(slider);
+              row.appendChild(toggleLabel);
+            } else if (s.type === "text") {
+              const input = document.createElement("input");
+              input.type = "text";
+              input.value = settings[s.name] ?? s.default;
+              input.className = "style-text-input";
+              input.placeholder = s.default;
+              input.addEventListener("change", function () {
+                chrome.storage.sync.set({ [s.name]: input.value });
+              });
+              row.appendChild(input);
+            }
+            varsSection.appendChild(row);
+          }
 
           // ── Var rows ──────────────────────────────────────────────
           for (const v of cardVars) {
