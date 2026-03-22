@@ -21,6 +21,7 @@ export async function launchExtension() {
     args: [
       `--disable-extensions-except=${extensionPath}`,
       `--load-extension=${extensionPath}`,
+      "--headless=new",
     ],
   });
 

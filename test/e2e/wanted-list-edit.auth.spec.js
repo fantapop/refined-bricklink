@@ -187,8 +187,10 @@ test.describe("Wanted List Edit Page (auth required)", () => {
       .locator(".wl-col-quantity input.form-text.width-small")
       .first();
 
-    // Hover the quantity field to show the control panel
-    await quantityInput.hover();
+    // Hover the quantity field to show the control panel.
+    // force:true skips the interception check — the panel appears on CSS :hover and
+    // can cover the input center, causing Playwright to retry indefinitely otherwise.
+    await quantityInput.hover({ force: true });
     const panel = quantityInput.locator("..").locator(".rb-spin-panel");
     await expect(panel).toBeVisible();
 
