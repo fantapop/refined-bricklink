@@ -21,6 +21,18 @@
     return field.value;
   }
 
+  // Use native input value setter to trigger React's synthetic event system.
+  var nativeInputSetter = Object.getOwnPropertyDescriptor(
+    window.HTMLInputElement.prototype,
+    "value"
+  ).set;
+
+  function setFieldValue(field, newValue) {
+    nativeInputSetter.call(field, String(newValue));
+    field.dispatchEvent(new Event("input", { bubbles: true }));
+    field.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
   // ── Spinner panel (replaces native spinners on changed number inputs) ─
 
   function isQuantityInput(field) {
@@ -52,9 +64,8 @@
       '<svg width="8" height="5" viewBox="0 0 8 5"><polygon points="4,0.5 7,4.5 1,4.5" fill="#555"/></svg>';
     up.addEventListener("click", function (e) {
       e.preventDefault();
-      field.stepUp();
-      field.dispatchEvent(new Event("input", { bubbles: true }));
-      field.dispatchEvent(new Event("change", { bubbles: true }));
+      var step = field.step ? Number(field.step) : 1;
+      setFieldValue(field, (Number(field.value) || 0) + step);
     });
 
     // Equals (top-right) — sets this field to match its sibling
@@ -66,11 +77,7 @@
     eq.addEventListener("click", function (e) {
       e.preventDefault();
       var sibling = getSiblingInput(field);
-      if (sibling) {
-        field.value = sibling.value;
-        field.dispatchEvent(new Event("input", { bubbles: true }));
-        field.dispatchEvent(new Event("change", { bubbles: true }));
-      }
+      if (sibling) setFieldValue(field, sibling.value);
     });
 
     // Down (bottom-left)
@@ -81,9 +88,9 @@
       '<svg width="8" height="5" viewBox="0 0 8 5"><polygon points="4,4.5 1,0.5 7,0.5" fill="#555"/></svg>';
     down.addEventListener("click", function (e) {
       e.preventDefault();
-      field.stepDown();
-      field.dispatchEvent(new Event("input", { bubbles: true }));
-      field.dispatchEvent(new Event("change", { bubbles: true }));
+      var step = field.step ? Number(field.step) : 1;
+      var min = field.min !== "" ? Number(field.min) : 0;
+      setFieldValue(field, Math.max(min, (Number(field.value) || 0) - step));
     });
 
     // Revert (bottom-right)
@@ -94,9 +101,7 @@
       '<svg width="5" height="8" viewBox="0 0 5 8"><polygon points="0.5,4 4.5,1 4.5,7" fill="#555"/></svg>';
     revert.addEventListener("click", function (e) {
       e.preventDefault();
-      field.value = originalValue;
-      field.dispatchEvent(new Event("input", { bubbles: true }));
-      field.dispatchEvent(new Event("change", { bubbles: true }));
+      setFieldValue(field, originalValue);
     });
 
     panel.appendChild(up);
@@ -127,8 +132,11 @@
 
   // ── Per-field setup ──────────────────────────────────────────────────
 
-  function setupField(field) {
-    var originalValue = getOriginalValue(field);
+  function setupField(field, preservedOriginalValue) {
+    var originalValue =
+      preservedOriginalValue !== undefined
+        ? preservedOriginalValue
+        : getOriginalValue(field);
     var panel = null;
 
     // Quantity number inputs get the custom spinner panel
@@ -257,6 +265,16 @@
           return true;
         }
 
+        // If we already had tracked fields (mid-session React re-render), preserve
+        // originalValues by index so user changes survive the DOM replacement.
+        // Only re-snapshot when transitioning from no fields → fields (entering edit mode).
+        var preservedOriginals = [];
+        if (tracked.length > 0) {
+          for (var i = 0; i < tracked.length; i++) {
+            preservedOriginals[i] = tracked[i].originalValue;
+          }
+        }
+
         // Clear old tracked entries and remove old panels
         for (var i = 0; i < tracked.length; i++) {
           var entry = tracked[i];
@@ -277,17 +295,18 @@
           changeHandler = null;
         }
 
-        // Set up new fields
+        // Set up new fields, reusing preserved originalValues when available
         for (var i = 0; i < fields.length; i++) {
-          setupField(fields[i]);
+          setupField(fields[i], preservedOriginals[i]);
         }
 
         // Also track notify checkboxes
         var notifyChecks = table.querySelectorAll(
           ".wl-col-notify input[type=checkbox]"
         );
+        var notifyOffset = fields.length;
         for (var i = 0; i < notifyChecks.length; i++) {
-          setupField(notifyChecks[i]);
+          setupField(notifyChecks[i], preservedOriginals[notifyOffset + i]);
         }
 
         // Event delegation for change detection

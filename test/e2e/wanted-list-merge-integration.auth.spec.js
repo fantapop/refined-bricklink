@@ -7,107 +7,10 @@
  */
 import { test, expect } from "@playwright/test";
 import { launchExtension } from "./helpers/extension-context.js";
+import { createWantedList, deleteWantedList } from "./helpers/wanted-list-crud.js";
 
 const TEST_LIST_NAME = "RB E2E Test (auto-delete)";
 const BL = "https://www.bricklink.com";
-
-// ── Helpers ──────────────────────────────────────────────────────────────────
-
-/**
- * Creates a new wanted list via the BrickLink management UI.
- * Returns the wantedMoreID string of the created list.
- */
-/**
- * Returns the wantedMoreID of an existing list with the given name, or null.
- * Used to detect leftover test lists from previous failed runs.
- */
-async function findListByName(context, name) {
-  const page = await context.newPage();
-  await page.goto(`${BL}/v2/wanted/list.page`, { waitUntil: "domcontentloaded" });
-  await page.waitForSelector("table.wl-overview-list-table", { timeout: 15000 });
-  const id = await page.evaluate((listName) => {
-    for (const a of document.querySelectorAll('a[href*="wantedMoreID="]')) {
-      if (a.textContent.trim() === listName) {
-        const m = a.href.match(/wantedMoreID=(\d+)/);
-        return m ? m[1] : null;
-      }
-    }
-    return null;
-  }, name);
-  await page.close();
-  return id;
-}
-
-async function createWantedList(context, name) {
-  // Clean up any leftover list from a previous failed run
-  const existingId = await findListByName(context, name);
-  if (existingId) await deleteWantedList(context, existingId);
-
-  const page = await context.newPage();
-  await page.goto(`${BL}/v2/wanted/list.page`, { waitUntil: "domcontentloaded" });
-  await page.waitForSelector("table.wl-overview-list-table", { timeout: 15000 });
-
-  await page.getByRole("button", { name: "Create New List" }).click();
-
-  // Wait for the name input inside the modal to be ready
-  const nameInput = page.locator(".wl-edit-modal-container input.form-text").first();
-  await expect(nameInput).toBeVisible({ timeout: 10000 });
-  await nameInput.fill(name);
-
-  // BrickLink navigates to the new list's search page after creation
-  await Promise.all([
-    page.waitForURL(/wantedMoreID=/, { timeout: 15000 }),
-    page.getByRole("button", { name: "Create Wanted List" }).click(),
-  ]);
-
-  const m = page.url().match(/wantedMoreID=(\d+)/);
-  const id = m ? m[1] : null;
-
-  await page.close();
-  return id;
-}
-
-/**
- * Deletes a wanted list by wantedMoreID, but only after confirming its name
- * matches TEST_LIST_NAME — so we never accidentally delete a real list.
- */
-async function deleteWantedList(context, wantedMoreID) {
-  const page = await context.newPage();
-  await page.goto(`${BL}/v2/wanted/list.page`, { waitUntil: "domcontentloaded" });
-  await page.waitForSelector("table.wl-overview-list-table", { timeout: 15000 });
-
-  // Safety check: confirm the list with this ID has exactly the test list name
-  const actualName = await page.evaluate((id) => {
-    for (const a of document.querySelectorAll('a[href*="wantedMoreID="]')) {
-      if (a.href.includes(`wantedMoreID=${id}`)) return a.textContent.trim();
-    }
-    return null;
-  }, wantedMoreID);
-
-  if (actualName !== TEST_LIST_NAME) {
-    await page.close();
-    throw new Error(
-      `Safety: refusing to delete list ${wantedMoreID} — expected name "${TEST_LIST_NAME}", got "${actualName}"`
-    );
-  }
-
-  // Open Setup dialog for this list row
-  const row = page.locator(`tr:has(a[href*="wantedMoreID=${wantedMoreID}"])`);
-  await row.getByRole("button", { name: "Setup" }).click();
-  await expect(page.locator(".modal-footer button.text-link--grey")).toBeVisible({ timeout: 10000 });
-
-  // BrickLink uses window.confirm() — accept it before clicking Delete
-  page.once("dialog", (dialog) => dialog.accept());
-  await page.locator(".modal-footer button.text-link--grey").click();
-
-  // Wait until the list link is gone from the table (confirms deletion completed)
-  await page.reload({ waitUntil: "domcontentloaded" });
-  await expect(
-    page.locator(`a[href*="wantedMoreID=${wantedMoreID}"]`).first()
-  ).not.toBeVisible({ timeout: 15000 });
-
-  await page.close();
-}
 
 /**
  * Fetches totalResults for a wanted list from its search page wlJson.
@@ -216,7 +119,7 @@ test.describe("Add Lists integration (auth required)", () => {
     } finally {
       // ── Cleanup: delete the test list (name-verified before deletion) ───────
       if (newListId) {
-        await deleteWantedList(context, newListId);
+        await deleteWantedList(context, newListId, TEST_LIST_NAME);
       }
       await context.close();
     }

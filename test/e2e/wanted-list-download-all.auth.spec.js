@@ -4,6 +4,7 @@
  */
 import { test, expect } from "@playwright/test";
 import { launchExtension } from "./helpers/extension-context.js";
+import { createWantedList, deleteWantedList } from "./helpers/wanted-list-crud.js";
 
 // ── ZIP helpers ────────────────────────────────────────────────────────────
 
@@ -97,18 +98,19 @@ test.describe("Wanted List Download All", () => {
 
   // ── UI ───────────────────────────────────────────────────────────────────
 
-  test("button appears with download icon and 'All' label", async () => {
+  test("button appears with download icon and a label", async () => {
     const btn = page.locator(".rb-dl-all-btn");
     await expect(btn.locator("i.fas.fa-download")).toBeVisible();
-    await expect(btn.locator(".rb-dl-all-label")).toHaveText("All");
+    await expect(btn.locator(".rb-dl-all-label")).toHaveText(/^(All|Visible \(\d+\)|All \(\d+\))$/);
   });
 
   test("label switches to '(N)' when search filter is applied", async () => {
     const table = page.locator("table.wl-overview-list-table:not(.compact)");
-    const totalRows = await table.locator("tr:has(td)").count();
+    const visibleRows = table.locator("tr:has(td)").filter({ visible: true });
+    const totalVisibleRows = await visibleRows.count();
 
-    // Use the first word of the first list name as the search term
-    const firstListName = await table.locator("tr:has(td) a").first().textContent();
+    // Use the first word of the first VISIBLE list name as the search term
+    const firstListName = await visibleRows.locator("a").first().textContent();
     const searchTerm = firstListName.trim().split(/\s+/)[0];
 
     await page.locator("input.search-query").fill(searchTerm);
@@ -119,12 +121,14 @@ test.describe("Wanted List Download All", () => {
 
     const filteredCount = parseInt((await label.textContent()).replace(/[()]/g, ""), 10);
     expect(filteredCount).toBeGreaterThan(0);
-    expect(filteredCount).toBeLessThanOrEqual(totalRows);
+    expect(filteredCount).toBeLessThanOrEqual(totalVisibleRows);
   });
 
-  test("label reverts to 'All' when search is cleared", async () => {
+  test("label reverts to base state when search is cleared", async () => {
     const input = page.locator("input.search-query");
     const label = page.locator(".rb-dl-all-btn .rb-dl-all-label");
+
+    const baseLabel = await label.textContent();
 
     await input.fill("castle");
     await input.dispatchEvent("input");
@@ -132,15 +136,15 @@ test.describe("Wanted List Download All", () => {
 
     await input.fill("");
     await input.dispatchEvent("input");
-    await expect(label).toHaveText("All");
+    await expect(label).toHaveText(baseLabel);
   });
 
   // ── Downloads ────────────────────────────────────────────────────────────
 
   test("downloads a ZIP containing one .xml per list", async () => {
     const table = page.locator("table.wl-overview-list-table:not(.compact)");
-    const rowCount = await table.locator("tr:has(td)").count();
-    test.skip(rowCount < 2, "Need at least 2 wanted lists");
+    const visibleRowCount = await table.locator("tr:has(td)").filter({ visible: true }).count();
+    test.skip(visibleRowCount < 2, "Need at least 2 visible wanted lists");
 
     const [download] = await Promise.all([
       page.waitForEvent("download"),
@@ -152,7 +156,7 @@ test.describe("Wanted List Download All", () => {
     const buf = await readDownload(download);
     const filenames = extractZipFilenames(buf);
 
-    expect(filenames.length).toBe(rowCount);
+    expect(filenames.length).toBe(visibleRowCount);
     for (const name of filenames) {
       expect(name).toMatch(/\.xml$/i);
     }
@@ -160,8 +164,8 @@ test.describe("Wanted List Download All", () => {
 
   test("ZIP entries contain valid BrickLink XML", async () => {
     const table = page.locator("table.wl-overview-list-table:not(.compact)");
-    const rowCount = await table.locator("tr:has(td)").count();
-    test.skip(rowCount < 2, "Need at least 2 wanted lists");
+    const rowCount = await table.locator("tr:has(td)").filter({ visible: true }).count();
+    test.skip(rowCount < 2, "Need at least 2 visible wanted lists");
 
     const [download] = await Promise.all([
       page.waitForEvent("download"),
@@ -176,44 +180,56 @@ test.describe("Wanted List Download All", () => {
       const entry = readZipEntry(buf, filename);
       expect(entry, `entry for ${filename} should exist`).not.toBeNull();
       const xml = entry.toString("utf-8");
-      expect(xml, `${filename} should contain WANTEDLIST`).toMatch(
-        /<WANTEDLIST>|<\/WANTEDLIST>/i
+      expect(xml, `${filename} should contain INVENTORY`).toMatch(
+        /<INVENTORY[\s/>]/i
       );
     }
   });
 
   test("filtered download uses wanted-lists-filtered.zip filename", async () => {
-    const table = page.locator("table.wl-overview-list-table:not(.compact)");
-    const rowCount = await table.locator("tr:has(td)").count();
-    test.skip(rowCount < 2, "Need at least 2 wanted lists to test filtering");
+    // Create 2 lists with a unique prefix so filtering is deterministic.
+    // They will always be a subset of all lists (user has real lists too).
+    const NAME_A = "RB E2E Filter Test A (auto-delete)";
+    const NAME_B = "RB E2E Filter Test B (auto-delete)";
+    const SEARCH_TERM = "RB E2E Filter Test";
 
-    // Filter to fewer lists by using a specific search term
-    const firstListName = await table.locator("tr:has(td) a").first().textContent();
-    const searchTerm = firstListName.trim().split(/\s+/)[0];
+    const idA = await createWantedList(context, NAME_A);
+    const idB = await createWantedList(context, NAME_B);
 
-    const input = page.locator("input.search-query");
-    await input.fill(searchTerm);
-    await input.dispatchEvent("input");
+    try {
+      // Reload the page so the new lists appear in the table
+      await page.reload({ waitUntil: "domcontentloaded" });
+      await expect(page.locator(".rb-dl-all-btn")).toBeVisible({ timeout: 10000 });
 
-    const label = page.locator(".rb-dl-all-btn .rb-dl-all-label");
-    await expect(label).toHaveText(/^\(\d+\)$/);
+      const input = page.locator("input.search-query");
+      const label = page.locator(".rb-dl-all-btn .rb-dl-all-label");
 
-    const filteredCount = parseInt(
-      (await label.textContent()).replace(/[()]/g, ""),
-      10
-    );
-    test.skip(filteredCount < 2, "Search term matches all lists — need a more selective term");
+      await input.fill(SEARCH_TERM);
+      await input.dispatchEvent("input");
 
-    const [download] = await Promise.all([
-      page.waitForEvent("download"),
-      page.locator(".rb-dl-all-btn").click(),
-    ]);
+      // Label should switch to "(N)" — filtered, not showing all lists
+      await expect(label).toHaveText(/^\(\d+\)$/);
 
-    expect(download.suggestedFilename()).toBe("wanted-lists-filtered.zip");
+      const filteredCount = parseInt(
+        (await label.textContent()).replace(/[()]/g, ""),
+        10
+      );
+      expect(filteredCount).toBeGreaterThanOrEqual(2);
 
-    const buf = await readDownload(download);
-    const filenames = extractZipFilenames(buf);
-    expect(filenames.length).toBe(filteredCount);
+      const [download] = await Promise.all([
+        page.waitForEvent("download"),
+        page.locator(".rb-dl-all-btn").click(),
+      ]);
+
+      expect(download.suggestedFilename()).toBe("wanted-lists-filtered.zip");
+
+      const buf = await readDownload(download);
+      const filenames = extractZipFilenames(buf);
+      expect(filenames.length).toBe(filteredCount);
+    } finally {
+      if (idA) await deleteWantedList(context, idA, NAME_A);
+      if (idB) await deleteWantedList(context, idB, NAME_B);
+    }
   });
 
   test("single filtered list downloads as XML directly (no zip)", async () => {
@@ -248,6 +264,6 @@ test.describe("Wanted List Download All", () => {
 
     const buf = await readDownload(download);
     const xml = buf.toString("utf-8");
-    expect(xml).toMatch(/<WANTEDLIST>|<\/WANTEDLIST>/i);
+    expect(xml).toMatch(/<INVENTORY[\s/>]/i);
   });
 });

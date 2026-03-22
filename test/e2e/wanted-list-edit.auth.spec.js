@@ -182,19 +182,20 @@ test.describe("Wanted List Edit Page (auth required)", () => {
       "1 item changed"
     );
 
-    // Verify control panel buttons still work (revert button should be visible)
+    // Verify control panel buttons still work
     const quantityInput = page
       .locator(".wl-col-quantity input.form-text.width-small")
       .first();
-    const qtyOriginal = await quantityInput.inputValue();
-    await quantityInput.fill(String(Number(qtyOriginal) + 5));
 
     // Hover the quantity field to show the control panel
     await quantityInput.hover();
     const panel = quantityInput.locator("..").locator(".rb-spin-panel");
     await expect(panel).toBeVisible();
 
-    // Revert button should be visible
+    // Click the increment button in our panel — this fires the input event and marks the field changed
+    await panel.locator(".rb-s-up").click();
+
+    // Revert button should now be visible
     const revertBtn = panel.locator(".rb-s-revert");
     await expect(revertBtn).not.toHaveClass(/rb-hidden/);
   });
