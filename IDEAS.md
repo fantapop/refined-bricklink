@@ -5,7 +5,6 @@
 
 ## Wanted List – Edit Page
 - Part search filters should be hidden when there are no applicable values (e.g. hide color filter if all items share one color). Related to `wanted-list-smart-filters`.
-- Default to 100 items per page.
 - Save state before saving (snapshot for rollback/protection).
 - Modification history with undo/redo (forward and backward buttons).
 
@@ -21,4 +20,3 @@
 
 ## General UI
 - Pressing Esc while a modal is open should close it.
-- Add an option for a larger page size.

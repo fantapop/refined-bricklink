@@ -6,7 +6,10 @@
   // registry.js is loaded synchronously in options.html.
   // main.js is not needed on the options page.
   const manifest = chrome.runtime.getManifest();
-  const scripts = manifest.content_scripts[0].js.filter(function (src) {
+  const mainBlock = manifest.content_scripts.find(function (b) {
+    return b.js && b.js.includes("main.js");
+  });
+  const scripts = (mainBlock ? mainBlock.js : []).filter(function (src) {
     return src !== "registry.js" && src !== "main.js";
   });
 
@@ -111,7 +114,7 @@
 
           // ── Settings rows ─────────────────────────────────────────
           for (const s of cardSettings) {
-            if (s.type !== "boolean" && s.type !== "text") continue;
+            if (s.type !== "boolean" && s.type !== "text" && s.type !== "select") continue;
             const row = document.createElement("div");
             row.className = "style-row";
 
@@ -146,6 +149,29 @@
               toggleLabel.appendChild(scb);
               toggleLabel.appendChild(slider);
               row.appendChild(toggleLabel);
+            } else if (s.type === "select") {
+              const sel = document.createElement("select");
+              sel.className = "style-select-input";
+              let opts = s.options || [];
+              if (s.optionsFrom && settings[s.optionsFrom]) {
+                opts = settings[s.optionsFrom]
+                  .split(",")
+                  .map((v) => v.trim())
+                  .filter((v) => v && !isNaN(parseInt(v, 10)))
+                  .sort((a, b) => parseInt(a, 10) - parseInt(b, 10))
+                  .map((v) => ({ value: v, label: v }));
+              }
+              for (const opt of opts) {
+                const option = document.createElement("option");
+                option.value = opt.value;
+                option.textContent = opt.label;
+                if (String(settings[s.name]) === String(opt.value)) option.selected = true;
+                sel.appendChild(option);
+              }
+              sel.addEventListener("change", function () {
+                chrome.storage.sync.set({ [s.name]: sel.value });
+              });
+              row.appendChild(sel);
             } else if (s.type === "text") {
               const input = document.createElement("input");
               input.type = "text";

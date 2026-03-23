@@ -12,11 +12,22 @@
   "content_scripts": [
     {
       "matches": [
+        "*://*.bricklink.com/v2/wanted/search.page*"
+      ],
+      "js": [
+        "features/wanted-list-page-size-options-preload.js"
+      ],
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
         "*://*.bricklink.com/*"
       ],
       "js": [
         "registry.js",
         "features/wanted-list-hide.js",
+        "features/wanted-list-page-size.js",
+        "features/wanted-list-page-size-options.js",
         "features/reverse-wanted-list.js",
         "features/quantity-spacing.js",
         "features/wanted-list-change-tracker.js",

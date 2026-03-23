@@ -45,6 +45,16 @@ Adds a button next to the search bar to bulk-download all your wanted lists as a
 
 <img src="docs/screenshots/wanted-list-download-filtered.png" width="600" alt="Wanted Lists page showing Download (3) button when search filter is active">
 
+#### Default Page Size
+
+Rewrites wanted list links to open directly with your preferred number of items per page, so you never have to change the selector manually. Configure the default via the Customize panel (e.g. 100 or 500).
+
+#### Custom Page Size Options
+
+Replaces the items-per-page dropdown on wanted list search pages with a configurable set of values. The default options are 50, 100, 250, and 500 — but you can enter any comma-separated list in the Customize panel. The Default Page Size setting above automatically reflects your configured options.
+
+<img src="docs/screenshots/wanted-list-page-size-options.png" width="500" alt="Items-per-page dropdown showing custom options: 50, 100, 250, 500 per pg">
+
 ### Search
 
 #### Quantity Control Panel

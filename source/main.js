@@ -39,7 +39,7 @@
     for (const feature of features) {
       if (settings[feature.id]) {
         try {
-          feature.init();
+          feature.init(settings);
         } catch (err) {
           console.error(`[Refined Bricklink] Failed to init feature "${feature.id}":`, err);
         }
@@ -47,7 +47,19 @@
     }
   }
 
-  chrome.storage.sync.get(defaults, initFeatures);
+  // If we have a cache from a previous page load, init synchronously right now
+  // (no async wait) so features like page-size-options apply before first paint.
+  // The async storage read runs in parallel to refresh the cache for next load.
+  const CACHE_KEY = "rb-settings-cache";
+  let cached = null;
+  try { cached = JSON.parse(localStorage.getItem(CACHE_KEY)); } catch (e) {}
+
+  chrome.storage.sync.get(defaults, function (settings) {
+    try { localStorage.setItem(CACHE_KEY, JSON.stringify(settings)); } catch (e) {}
+    if (!cached) initFeatures(settings);
+  });
+
+  if (cached) initFeatures(cached);
 
   if (typeof module !== "undefined" && module.exports) {
     module.exports = { initFeatures, defaults };
