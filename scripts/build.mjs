@@ -55,10 +55,13 @@ for (const file of readdirSync(featuresDest)) {
 
 // Inject build timestamp into main.js in the built copy so the rb-version
 // meta tag reflects when the build was made, without touching manifest.json.
-const buildStamp = new Date()
-  .toISOString()
-  .replace(/[^0-9]/g, "")
-  .replace(/^(\d{8})(\d{4}).*$/, "$1-$2"); // YYYYMMDDHHmm → YYYYMMDD-HHmm
+const now = new Date();
+const pad = (n) => String(n).padStart(2, "0");
+const buildStamp = [
+  now.getFullYear(),
+  pad(now.getMonth() + 1),
+  pad(now.getDate()),
+].join("") + "-" + pad(now.getHours()) + pad(now.getMinutes());
 const mainJsBuildPath = join(dest, "main.js");
 let mainJsContent = readFileSync(mainJsBuildPath, "utf-8");
 mainJsContent = mainJsContent.replace(
@@ -71,6 +74,15 @@ console.log(`  stamped build time ${buildStamp} → main.js`);
 // Package into build/out/
 const manifest = JSON.parse(readFileSync(join(src, "manifest.json"), "utf-8"));
 const version = manifest.version;
+
+// Stamp the build time into the manifest version in build/source/ as a 4th
+// component (MMDD.HHmm) so chrome://extensions shows it updating on each build.
+const manifestBuildPath = join(dest, "manifest.json");
+const builtManifest = JSON.parse(readFileSync(manifestBuildPath, "utf-8"));
+const [hh, min] = [pad(now.getHours()), pad(now.getMinutes())];
+builtManifest.version = `${version}.${hh}${min}`;
+writeFileSync(manifestBuildPath, JSON.stringify(builtManifest, null, 2) + "\n", "utf-8");
+console.log(`  stamped build version ${builtManifest.version} → manifest.json`);
 
 // Keep package.json version in sync with manifest.json
 const pkgPath = join(root, "package.json");
