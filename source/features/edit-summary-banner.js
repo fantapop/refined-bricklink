@@ -82,18 +82,14 @@
       }
     }
 
-    console.log("[edit-summary-banner] updateSummary() found", changedRows.length, "changed rows");
-
     // Always clear previous content first
     summaryEl.innerHTML = "";
 
     if (changedRows.length === 0) {
-      console.log("[edit-summary-banner] No changes, hiding summary");
       summaryEl.style.display = "none";
       return;
     }
 
-    console.log("[edit-summary-banner] Showing summary for changes");
     summaryEl.style.display = "";
 
     // Wrap link + popover so hovering anywhere in the wrapper keeps popover open
@@ -208,12 +204,8 @@
       }
 
       var wireUp = function () {
-        console.log("[edit-summary-banner] wireUp() called");
         // Prevent re-entry during DOM modifications
-        if (isWiringUp) {
-          console.log("[edit-summary-banner] wireUp() skipped - already wiring up");
-          return true;
-        }
+        if (isWiringUp) return true;
         isWiringUp = true;
 
         // Temporarily disconnect observer to prevent cross-triggering with other features
@@ -228,7 +220,6 @@
           }
         }
         if (dataRows.length === 0) {
-          console.log("[edit-summary-banner] No editable fields found - clearing snapshots");
           // Clear snapshots when exiting edit mode (after save/cancel)
           // This ensures we don't compare against stale pre-save snapshots
           snapshots = [];
@@ -293,14 +284,11 @@
         for (var i = 0; i < dataRows.length; i++) {
           snapshots.push(snapshotRow(dataRows[i]));
         }
-        console.log("[edit-summary-banner] Snapshotted", snapshots.length, "rows");
-
         inputHandler = function () { updateSummary(); };
         changeHandler = function () { updateSummary(); };
         table.addEventListener("input", inputHandler);
         table.addEventListener("change", changeHandler);
 
-        console.log("[edit-summary-banner] Calling updateSummary()");
         updateSummary();
 
         // Reconnect observer after DOM modifications are complete

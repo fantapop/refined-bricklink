@@ -20,12 +20,8 @@
   }
 
   async function fetchAllWantedItems(wantedMoreID) {
-    if (fetchInProgress) {
-      console.log("[wanted-list-smart-filters] Fetch already in progress");
-      return null;
-    }
+    if (fetchInProgress) return null;
     if (cachedData && cachedData.wantedMoreID === wantedMoreID) {
-      console.log("[wanted-list-smart-filters] Using cached data");
       return cachedData.items;
     }
 
@@ -36,12 +32,8 @@
     try {
       while (true) {
         var url = `https://www.bricklink.com/v2/wanted/search.page?type=A&wantedMoreID=${wantedMoreID}&sort=1&pageSize=100&page=${page}`;
-        console.log("[wanted-list-smart-filters] Fetching page", page, "from", url);
         var response = await fetch(url);
-        if (!response.ok) {
-          console.log("[wanted-list-smart-filters] Response not ok:", response.status);
-          break;
-        }
+        if (!response.ok) break;
 
         var html = await response.text();
 
@@ -91,7 +83,6 @@
           defaultSelected: select.options[i].defaultSelected
         });
       }
-      console.log("[wanted-list-smart-filters] Saved", originalOptions[fieldName].length, "original options for", fieldName);
     }
 
     // Restore all original options before filtering
@@ -103,12 +94,9 @@
       opt.defaultSelected = optData.defaultSelected;
       select.appendChild(opt);
     });
-    console.log("[wanted-list-smart-filters] Restored", select.options.length, "options for", fieldName);
 
     // Get unique values from the wanted list items
     var uniqueValues = getUniqueValues(items, fieldName);
-
-    console.log("[wanted-list-smart-filters] Unique values for", fieldName, ":", uniqueValues);
 
     // Create a map of value -> display name from items
     var valueMap = {};
@@ -138,9 +126,7 @@
         option.value === "0" ||
         option.value === "-1";
 
-      if (isDefaultOption) {
-        continue;
-      }
+      if (isDefaultOption) continue;
 
       // Remove if not in unique values
       if (!uniqueValues.includes(value)) {
@@ -148,29 +134,14 @@
       }
     }
 
-    optionsToRemove.forEach(function (option) {
-      console.log("[wanted-list-smart-filters] Removing option:", option.value, option.text);
-      option.remove();
-    });
-
-    // Log remaining options
-    console.log("[wanted-list-smart-filters] Remaining options after filtering:");
-    for (var i = 0; i < select.options.length; i++) {
-      console.log("  -", select.options[i].value, ":", select.options[i].text);
-    }
+    optionsToRemove.forEach(function (option) { option.remove(); });
 
     // Auto-select and disable ONLY if all items have the exact same value
     if (allSameValue) {
-      console.log("[wanted-list-smart-filters] All items have same value:", singleValue, "for field:", fieldName);
-      console.log("[wanted-list-smart-filters] Looking for option with value:", singleValue, "valueProp:", valueProp);
-
-      // Find the matching option and select it
       var foundMatch = false;
       for (var i = 0; i < select.options.length; i++) {
         var option = select.options[i];
         var value = valueProp === "number" ? parseInt(option.value, 10) : option.value;
-
-        console.log("[wanted-list-smart-filters] Comparing", value, "===", singleValue, "?", value === singleValue);
 
         if (value === singleValue || (singleValue === "X" && option.value === "X")) {
           select.value = option.value;
@@ -185,7 +156,6 @@
             opacity: "0.6"
           };
 
-          console.log("[wanted-list-smart-filters] Auto-selected and disabled:", option.value);
           foundMatch = true;
           break;
         }
@@ -201,24 +171,14 @@
   }
 
   async function applySmartFilters() {
-    console.log("[wanted-list-smart-filters] applySmartFilters started");
-
     var filterContainer = document.querySelector(".search-item-filters");
-    if (!filterContainer) {
-      console.log("[wanted-list-smart-filters] Filter container not visible yet");
-      return;
-    }
-
-    console.log("[wanted-list-smart-filters] Filter container found");
+    if (!filterContainer) return;
 
     var wantedMoreID = getWantedMoreID();
-    console.log("[wanted-list-smart-filters] wantedMoreID:", wantedMoreID);
     if (!wantedMoreID) return;
 
     // Fetch all wanted items (will use cache if available)
-    console.log("[wanted-list-smart-filters] Getting items...");
     var items = await fetchAllWantedItems(wantedMoreID);
-    console.log("[wanted-list-smart-filters] Got items:", items ? items.length : 0);
     if (!items || items.length === 0) return;
 
     // Find the select elements by their labels
@@ -231,9 +191,6 @@
         optimizeSelectFilter(select, items, "colorID", "number", "colorName");
       } else if (label === "Condition:") {
         optimizeSelectFilter(select, items, "wantedNew", "string");
-      } else if (label === "Years:") {
-        // Years might need special handling if it's in the data
-        // For now, skip it since wantedItems doesn't seem to have year info
       }
     }
   }
@@ -250,25 +207,14 @@
     docsUrl: "https://github.com/fantapop/refined-bricklink#smart-wanted-list-filters",
 
     init: function () {
-      console.log("[wanted-list-smart-filters] init called, URL:", window.location.href);
-
       // Only run on wanted list search pages
-      if (!window.location.href.includes("/wanted/search.page")) {
-        console.log("[wanted-list-smart-filters] Not on search page, skipping");
-        return;
-      }
+      if (!window.location.href.includes("/wanted/search.page")) return;
 
       var wantedMoreID = getWantedMoreID();
-      if (!wantedMoreID) {
-        console.log("[wanted-list-smart-filters] No wantedMoreID found");
-        return;
-      }
+      if (!wantedMoreID) return;
 
       // Start fetching data in the background
-      console.log("[wanted-list-smart-filters] Pre-fetching all items...");
-      fetchAllWantedItems(wantedMoreID).then(function(items) {
-        console.log("[wanted-list-smart-filters] Pre-fetch complete:", items ? items.length : 0, "items");
-      }).catch(function(err) {
+      fetchAllWantedItems(wantedMoreID).catch(function(err) {
         console.error("[wanted-list-smart-filters] Pre-fetch error:", err);
       });
 
@@ -279,11 +225,9 @@
 
         // Only apply filters when container first appears, not on subsequent changes
         if (filterContainer && !filterContainerSeen) {
-          console.log("[wanted-list-smart-filters] Filter container appeared, applying filters...");
           filterContainerSeen = true;
 
           applySmartFilters().then(function() {
-            console.log("[wanted-list-smart-filters] Smart filters applied");
             // Set up watcher on the filter container to detect React re-renders
             setupFilterContainerWatcher();
           }).catch(function(err) {
@@ -292,7 +236,6 @@
         } else if (!filterContainer && filterContainerSeen) {
           // Container was hidden - reset flag so we can apply again when it reappears
           filterContainerSeen = false;
-          console.log("[wanted-list-smart-filters] Filter container hidden");
           // Disconnect the filter container watcher since it's hidden
           if (filterContainerWatcher) {
             filterContainerWatcher.disconnect();
@@ -304,8 +247,7 @@
       filterObserver.observe(document.body, { childList: true, subtree: true });
 
       // Function to restore filter select states
-      restoreFilterStates = function(event) {
-        console.log("[wanted-list-smart-filters] Restoring filter states after mutation or event:", event);
+      restoreFilterStates = function() {
         var filterContainer = document.querySelector(".search-item-filters");
         if (!filterContainer) return;
 
@@ -322,7 +264,6 @@
             var expected = expectedSelectStates[fieldName];
 
             if (select.value !== expected.value || select.disabled !== expected.disabled) {
-              console.log("[wanted-list-smart-filters] Restoring filter state:", fieldName, expected.value);
               select.value = expected.value;
               select.disabled = expected.disabled;
               select.style.opacity = expected.opacity;
@@ -342,15 +283,10 @@
         }
 
         var table = document.querySelector(".table-wl-edit");
-        if (!table) {
-          console.log("[wanted-list-smart-filters] Table not found, skipping observer setup");
-          return;
-        }
+        if (!table) return;
 
         // Watch table for mutations (user editing items)
-        tableObserver = new MutationObserver(function(mutations) {
-          console.log("[wanted-list-smart-filters] Table mutated, watching for filter changes...");
-
+        tableObserver = new MutationObserver(function() {
           // Clear any existing polling interval
           if (pollIntervalId) {
             clearInterval(pollIntervalId);
@@ -358,7 +294,6 @@
           }
 
           // Start polling to detect filter changes (React updates filters ~10-20ms after table)
-          var startTime = Date.now();
           var checkCount = 0;
           var maxChecks = 100; // 100 checks * 5ms = 500ms max
 
@@ -387,8 +322,6 @@
                 var expected = expectedSelectStates[fieldName];
                 if (select.value !== expected.value || select.disabled !== expected.disabled) {
                   needsRestore = true;
-                  var elapsed = Date.now() - startTime;
-                  console.log("[wanted-list-smart-filters] Filter changed after", elapsed, "ms -", "restoring");
                   break;
                 }
               }
@@ -406,7 +339,6 @@
         });
 
         tableObserver.observe(table, { childList: true, subtree: true, attributes: true });
-        console.log("[wanted-list-smart-filters] Table observer set up");
       }
 
       // Watch for save banner to appear, then watch for it to hide (save complete)
@@ -416,30 +348,20 @@
       bannerWatcher = new MutationObserver(function() {
         var banner = document.getElementById("wanted-save-banner");
         if (!banner) {
-          if (lastBannerHeight !== null) {
-            console.log("[wanted-list-smart-filters] Banner removed from DOM");
-            lastBannerHeight = null;
-          }
+          lastBannerHeight = null;
           return;
         }
 
         var currentHeight = banner.offsetHeight;
 
-        // Log any height change for debugging
-        if (currentHeight !== lastBannerHeight) {
-          console.log("[wanted-list-smart-filters] Banner height changed:", lastBannerHeight, "→", currentHeight);
-        }
-
         // Banner just appeared (went from 0 to > 0 or first time seeing it)
         if ((lastBannerHeight === 0 || lastBannerHeight === null) && currentHeight > 0) {
-          console.log("[wanted-list-smart-filters] *** Edit mode entered - banner appeared ***");
           saveInProgress = false;
 
           // React re-renders the filters when entering edit mode, resetting their values
           // Re-apply the filter state (but don't re-fetch data)
           var filterContainer = document.querySelector(".search-item-filters");
           if (filterContainer && cachedData) {
-            console.log("[wanted-list-smart-filters] Re-applying filter state after edit mode entered");
             applySmartFilters().then(function() {
               setupFilterContainerWatcher();
             });
@@ -448,21 +370,16 @@
 
         // Banner just hid (went from > 0 to 0) - save completed
         if (lastBannerHeight > 0 && currentHeight === 0 && !saveInProgress) {
-          console.log("[wanted-list-smart-filters] Save detected, clearing cache");
           saveInProgress = true; // Prevent multiple triggers
           cachedData = null;
 
           // Re-fetch data in background
           var wantedMoreID = getWantedMoreID();
           if (wantedMoreID) {
-            console.log("[wanted-list-smart-filters] Re-fetching items after save...");
             fetchAllWantedItems(wantedMoreID).then(function(items) {
-              console.log("[wanted-list-smart-filters] Re-fetch complete:", items ? items.length : 0, "items");
-
               // Re-apply filters if they're currently visible
               var filterContainer = document.querySelector(".search-item-filters");
               if (filterContainer) {
-                console.log("[wanted-list-smart-filters] Re-applying filters with fresh data");
                 applySmartFilters().then(function() {
                   setupFilterContainerWatcher();
                 });
