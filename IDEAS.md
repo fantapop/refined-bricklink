@@ -4,7 +4,6 @@
 - During maintenance, disable links/buttons with JavaScript so the user stays on the same page rather than hitting a dead end. (`maintenance-link-guard` exists but is currently hidden from users because it wasn't working reliably — this would be part of fixing/replacing it.)
 
 ## Wanted List – Edit Page
-- Part search filters should be hidden when there are no applicable values (e.g. hide color filter if all items share one color). Related to `wanted-list-smart-filters`.
 - Save state before saving (snapshot for rollback/protection).
 - Modification history with undo/redo (forward and backward buttons).
 
