@@ -22,7 +22,9 @@ async function findListByPrefix(context, namePrefix) {
   await page.goto(`${BL}/v2/wanted/list.page`, { waitUntil: "domcontentloaded" });
   await page.waitForSelector("table.wl-overview-list-table", { timeout: 15000 });
   const result = await page.evaluate((prefix) => {
-    for (const a of document.querySelectorAll('a[href*="edit.page?wantedMoreID="]')) {
+    for (const a of document.querySelectorAll('a[href*="wantedMoreID="]')) {
+      // Match only list-page links (edit.page or search.page), not download buttons
+      if (!/\/wanted\/(search|edit)\.page/.test(a.href)) continue;
       if (a.textContent.trim().startsWith(prefix)) {
         const m = a.href.match(/wantedMoreID=(\d+)/);
         return m ? { id: m[1], name: a.textContent.trim() } : null;
@@ -71,7 +73,9 @@ async function deleteTestList(context, wantedMoreID) {
 
   // Safety: only delete if the name starts with our test prefix
   const actualName = await page.evaluate((id) => {
-    for (const a of document.querySelectorAll('a[href*="edit.page?wantedMoreID="]')) {
+    for (const a of document.querySelectorAll('a[href*="wantedMoreID="]')) {
+      // Match only list-page links (edit.page or search.page), not download buttons
+      if (!/\/wanted\/(search|edit)\.page/.test(a.href)) continue;
       if (a.href.includes(`wantedMoreID=${id}`)) return a.textContent.trim();
     }
     return null;
@@ -85,7 +89,7 @@ async function deleteTestList(context, wantedMoreID) {
   }
 
   // If the row is hidden (display:none), enable Show hidden first
-  const row = page.locator(`tr:has(a[href*="edit.page?wantedMoreID=${wantedMoreID}"])`);
+  const row = page.locator(`tr:has(a[href*="wantedMoreID=${wantedMoreID}"])`);
   const isHidden = await row.evaluate((el) => el.style.display === "none");
   if (isHidden) {
     const showHiddenCb = page.locator(".rb-show-hidden-cb");
@@ -140,14 +144,14 @@ test.describe("Hideable Wanted Lists (auth required)", () => {
       const page = await context.newPage();
       await page.goto(`${BL}/v2/wanted/list.page`, { waitUntil: "domcontentloaded" });
       await page.waitForSelector("table.wl-overview-list-table", { timeout: 15000 });
-      await expect(page.locator(`a[href*="edit.page?wantedMoreID=${testListId}"]`)).toBeVisible({ timeout: 10000 });
+      await expect(page.locator(`a[href*="wantedMoreID=${testListId}"]`).first()).toBeVisible({ timeout: 10000 });
 
       // Ensure "Show hidden" is off so the hide step has a visible effect
       const showHiddenCb = page.locator(".rb-show-hidden-cb");
       if (await showHiddenCb.isChecked()) await showHiddenCb.uncheck();
 
       // ── Step 4: Verify Setup modal has a Hide button ──────────────────────────
-      const testRow = page.locator(`tr:has(a[href*="edit.page?wantedMoreID=${testListId}"])`);
+      const testRow = page.locator(`tr:has(a[href*="wantedMoreID=${testListId}"])`);
       await testRow.getByRole("button", { name: "Setup" }).click();
       await expect(
         page.locator(".wl-edit-modal-container .modal-footer")
@@ -191,9 +195,9 @@ test.describe("Hideable Wanted Lists (auth required)", () => {
       await setupPage.waitForSelector("table.wl-overview-list-table", { timeout: 15000 });
       const searchUrl = await setupPage.evaluate(() => {
         const a = document.querySelector('a[href*="wantedMoreID="]');
-        return a
-          ? `https://www.bricklink.com/v2/wanted/search.page?wantedMoreID=${new URL(a.href).searchParams.get("wantedMoreID")}`
-          : null;
+        if (!a) return null;
+        const id = new URL(a.href).searchParams.get("wantedMoreID");
+        return id ? `https://www.bricklink.com/v2/wanted/search.page?wantedMoreID=${id}` : null;
       });
       await setupPage.close();
 
