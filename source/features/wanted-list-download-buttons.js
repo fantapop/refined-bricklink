@@ -2,6 +2,7 @@
   var observer = null;
   var bodyObserver = null;
   var styleEl = null;
+  var CSS = /* @inline */``;
   var isWiringUp = false;
 
   var featureDef = {
@@ -17,7 +18,7 @@
       if (!window.location.pathname.includes("/v2/wanted/list.page")) return;
 
       styleEl = document.createElement("style");
-      styleEl.textContent = `.rb-dl-btn { margin-left: 4px; }`;
+      styleEl.textContent = CSS;
       document.head.appendChild(styleEl);
 
       const addButtons = () => {

@@ -2,6 +2,7 @@
   var observer = null;
   var bodyObserver = null;
   var styleEl = null;
+  var CSS = /* @inline */``;
   var archiveBtn = null;
   var onInputHandler = null;
   var lastBtnText = "";
@@ -288,7 +289,7 @@
       if (!window.location.pathname.includes("/v2/wanted/list.page")) return;
 
       styleEl = document.createElement("style");
-      styleEl.textContent = `.rb-dl-all-btn { margin-left: 8px; white-space: nowrap; }`;
+      styleEl.textContent = CSS;
       document.head.appendChild(styleEl);
 
       insertBtn();
