@@ -45,7 +45,7 @@ jobs:
           fi
 
       - name: Create git tag
-        if: steps.check.outputs.release == 'true' && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: steps.check.outputs.release == 'true' && github.ref == 'refs/heads/main' && github.event_name == 'push' && !env.ACT
         run: |
           git tag "${{ steps.tag.outputs.name }}"
           git push origin "${{ steps.tag.outputs.name }}"
@@ -68,7 +68,7 @@ jobs:
         run: npm run build
 
       - name: Create GitHub Release
-        if: steps.check.outputs.release == 'true'
+        if: steps.check.outputs.release == 'true' && !env.ACT
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.tag.outputs.name }}
@@ -94,7 +94,7 @@ jobs:
             To verify, clone the repo at that tag and run `npm run build` — the SHA256 of `build/out/refined-bricklink-${{ steps.tag.outputs.name }}.zip` should match the checksum listed on this release.
 
       - name: Publish to Chrome Web Store
-        if: steps.check.outputs.release == 'true'
+        if: steps.check.outputs.release == 'true' && !env.ACT
         env:
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
           CHROME_CLIENT_SECRET: ${{ secrets.CHROME_CLIENT_SECRET }}

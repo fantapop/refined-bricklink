@@ -10,6 +10,7 @@
 import { readFileSync, writeFileSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
+import { execSync } from "child_process";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const root = resolve(__dirname, "..");
@@ -60,4 +61,21 @@ if (updatedReadme !== readme) {
   console.log(`  updated README.md`);
 }
 
-console.log(`Done. Don't forget to reload the extension and run npm run build.`);
+// ── Run CI via act ───────────────────────────────────────────────────────────
+
+console.log(`\nRunning CI workflow via act...`);
+try {
+  execSync("act push --job release", { stdio: "inherit", cwd: root });
+} catch {
+  console.error(`\nCI failed — reverting version files.`);
+  manifest.version = oldVersion;
+  writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + "\n", "utf-8");
+  pkg.version = oldVersion;
+  writeFileSync(packagePath, JSON.stringify(pkg, null, 2) + "\n", "utf-8");
+  if (updatedReadme !== readme) {
+    writeFileSync(readmePath, readme, "utf-8");
+  }
+  process.exit(1);
+}
+
+console.log(`\nDone. Ready to commit and push.`);
