@@ -1,0 +1,326 @@
+/* ── 3-column layout ── */
+.rb-ss-content {
+  display: flex;
+  flex-direction: row;
+  gap: 16px;
+  background: rgb(238, 238, 238);
+  padding: 21px 24px;
+  align-items: stretch;
+  min-height: 480px;
+  box-sizing: border-box;
+}
+.rb-ss-col {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.rb-ss-col-form    { flex: 1.1; }
+.rb-ss-col-parts   { flex: 1.4; }
+.rb-ss-col-results { flex: 2; }
+
+/* ── Action bar (top row) ── */
+.rb-ss-top-row {
+  background: rgb(212, 224, 233);
+  height: 50px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  flex-shrink: 0;
+}
+/* BL global CSS overrides padding to 0; scope+important restores it */
+#rb-set-detective-panel .rb-ss-top-row {
+  padding: 9px 12px !important;
+}
+.rb-ss-col-title {
+  font-size: 14px;
+  font-family: LatoWeb, "Helvetica Neue", Helvetica, Arial, serif;
+  color: rgb(51, 51, 51);
+  font-weight: 600;
+}
+.rb-ss-sort-controls {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.rb-ss-sort-caption {
+  font-size: 12px;
+  font-family: LatoWeb, "Helvetica Neue", Helvetica, Arial, serif;
+  color: rgb(51, 51, 51);
+  white-space: nowrap;
+}
+.rb-ss-sort-select {
+  font-size: 12px !important;
+  padding: 2px 4px !important;
+  height: auto !important;
+}
+
+/* ── Sub-header row ── */
+.rb-ss-sub-header {
+  background: rgb(200, 211, 219);
+  font-size: 12px;
+  font-family: LatoWeb, "Helvetica Neue", Helvetica, Arial, serif;
+  color: rgb(17, 17, 17);
+  padding: 6px 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  min-height: 31px;
+  box-sizing: border-box;
+}
+
+/* ── Scrollable content area ── */
+.rb-ss-list {
+  flex: 1;
+  overflow-y: auto;
+  background: #fff;
+  min-height: 0;
+}
+#rb-set-detective-panel .rb-ss-list { padding: 0 12px !important; }
+.rb-ss-list::-webkit-scrollbar { width: 8px; }
+.rb-ss-list::-webkit-scrollbar-track { background: #f0f0f0; }
+.rb-ss-list::-webkit-scrollbar-thumb { background: #bbb; border-radius: 4px; }
+.rb-ss-list::-webkit-scrollbar-thumb:hover { background: #999; }
+
+/* ── Empty / error states ── */
+.rb-ss-empty {
+  font-size: 13px;
+  font-family: LatoWeb, "Helvetica Neue", Helvetica, Arial, serif;
+  color: rgb(136, 136, 136);
+  font-style: italic;
+}
+#rb-set-detective-panel .rb-ss-empty {
+  padding: 12px 0 !important;
+}
+.rb-ss-error { color: rgb(192, 0, 0); font-style: normal; }
+
+/* ── Left column: form body ── */
+.rb-ss-form-body {
+  flex: 1;
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+/* BL global CSS can zero out padding; scope+important restores it */
+#rb-set-detective-panel .rb-ss-form-body {
+  padding: 16px 14px !important;
+}
+.rb-ss-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rb-ss-form-label {
+  font-size: 12px;
+  font-weight: bold;
+  color: rgb(17, 17, 17);
+  font-family: Arial, sans-serif;
+}
+.rb-ss-form-input {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: rgb(17, 17, 17);
+  border: 0.909091px solid rgb(204, 204, 204);
+  border-radius: 3px;
+  padding: 5px 8px;
+  height: 33px;
+  box-sizing: border-box;
+  width: 100%;
+}
+.rb-ss-form-input:focus { outline: none; border-color: rgb(0, 111, 168); }
+.rb-ss-qty-input { width: 72px; }
+
+/* Part info area */
+.rb-ss-part-info { display: flex; flex-direction: column; gap: 4px; }
+.rb-ss-hidden { display: none !important; }
+.rb-ss-part-info-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.rb-ss-part-img {
+  width: 52px;
+  height: 40px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+.rb-ss-part-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgb(17, 17, 17);
+  font-family: Arial, sans-serif;
+  line-height: 1.3;
+}
+.rb-ss-part-preview {
+  display: flex;
+  flex-direction: column;
+  min-height: 18px;
+}
+.rb-ss-part-status {
+  font-size: 12px;
+  color: rgb(102, 102, 102);
+  font-family: Arial, sans-serif;
+  font-style: italic;
+}
+
+/* Color select — swatch is absolutely positioned inside the select's left padding */
+.rb-ss-color-wrap {
+  position: relative;
+  width: 100%;
+}
+.rb-ss-form-swatch {
+  position: absolute;
+  left: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  pointer-events: none;
+  visibility: hidden;
+}
+.rb-ss-color-select {
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: rgb(17, 17, 17);
+  border: 0.909091px solid rgb(204, 204, 204);
+  border-radius: 3px;
+  padding: 5px 8px 5px 28px;
+  height: 33px;
+  width: 100%;
+  background: #fff;
+}
+.rb-ss-color-select:disabled {
+  color: rgb(153, 153, 153);
+  background: rgb(245, 245, 245);
+}
+
+/* Add Part button */
+.rb-ss-add-btn { width: 100%; }
+.rb-ss-add-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ── Middle column: parts sub-header + rows ── */
+/* Sub-header container gets same padding as top-row */
+#rb-set-detective-panel .rb-ss-parts-subheader { padding: 9px 12px !important; }
+#rb-set-detective-panel .rb-ss-form-subheader  { padding: 9px 12px !important; }
+.rb-ss-ph-img  { width: 52px; flex-shrink: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+.rb-ss-ph-desc { flex: 1; min-width: 0; }
+.rb-ss-ph-qty  { width: 52px; flex-shrink: 0; box-sizing: border-box; display: flex; align-items: center; }
+.rb-ss-ph-rm   { width: 32px; flex-shrink: 0; }
+/* Sub-header cells — right-side cells get padding matching data row cells */
+#rb-set-detective-panel .rb-ss-parts-subheader .rb-ss-ph-qty  { padding: 0 4px !important; }
+#rb-set-detective-panel .rb-ss-parts-subheader .rb-ss-ph-rm   { padding: 0 4px !important; }
+/* Data row cells — scoped to .rb-preview-row so they don't affect sub-header */
+#rb-set-detective-panel .rb-preview-row .rb-ss-ph-img  { padding: 9px 8px 9px 0 !important; }
+#rb-set-detective-panel .rb-preview-row .rb-ss-ph-desc { padding: 9px 4px !important; }
+#rb-set-detective-panel .rb-preview-row .rb-ss-ph-qty  { padding: 9px 4px !important; }
+#rb-set-detective-panel .rb-preview-row .rb-ss-ph-rm   { padding: 0 4px !important; }
+
+/* Editable qty input in each parts row */
+.rb-ss-qty-cell { display: flex; align-items: center; justify-content: flex-end; }
+#rb-set-detective-panel .rb-preview-row .rb-ss-qty-cell { padding: 9px 4px !important; }
+.rb-ss-row-qty-input {
+  width: 46px;
+  font-size: 12px;
+  font-family: Arial, sans-serif;
+  text-align: right;
+  border: 1px solid rgb(204, 204, 204);
+  border-radius: 2px;
+  padding: 2px 3px;
+  color: rgb(17, 17, 17);
+}
+
+.rb-ss-rm-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.rb-ss-btn-remove {
+  font-family: Arial, sans-serif;
+  font-size: 12px;
+  color: rgb(136, 136, 136);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px 4px;
+  line-height: 1;
+  border-radius: 2px;
+}
+.rb-ss-btn-remove:hover {
+  background: rgb(245, 245, 245);
+  color: rgb(17, 17, 17);
+}
+
+/* ── Right column: results sub-header + rows ── */
+/* Sub-header container gets same padding as top-row */
+#rb-set-detective-panel .rb-ss-results-subheader { padding: 9px 12px !important; }
+.rb-ss-rh-img     { width: 52px; flex-shrink: 0; box-sizing: border-box; display: flex; align-items: center; justify-content: center; }
+.rb-ss-rh-desc    { flex: 1; min-width: 0; }
+.rb-ss-rh-year    { width: 46px; flex-shrink: 0; box-sizing: border-box; font-size: 12px; }
+.rb-ss-rh-partqty { width: 50px; flex-shrink: 0; box-sizing: border-box; font-size: 12px; }
+/* Sub-header cells — right-side cells get padding matching data row cells */
+#rb-set-detective-panel .rb-ss-results-subheader .rb-ss-rh-year { padding: 0 4px !important; }
+/* Data row cells — scoped to .rb-preview-row so they don't affect sub-header */
+#rb-set-detective-panel .rb-preview-row .rb-ss-rh-img  { padding: 9px 8px 9px 0 !important; }
+#rb-set-detective-panel .rb-preview-row .rb-ss-rh-desc { padding: 9px 4px !important; }
+#rb-set-detective-panel .rb-preview-row .rb-ss-rh-year { padding: 9px 4px !important; }
+#rb-set-detective-panel .rb-preview-row .rb-ss-rh-partqty { padding: 9px 4px !important; }
+
+.rb-ss-results-year {
+  font-size: 12px;
+  color: rgb(102, 102, 102);
+}
+
+/* Row layout + content — defined here so we don't depend on merge feature's CSS */
+#rb-set-detective-panel .rb-preview-row {
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid #f0f0f0;
+}
+#rb-set-detective-panel .rb-preview-row:hover {
+  background: rgb(248, 250, 252);
+}
+#rb-set-detective-panel .rb-preview-img {
+  width: 36px;
+  height: 27px;
+  object-fit: contain;
+  display: block;
+}
+#rb-set-detective-panel .rb-preview-name {
+  font-size: 12px;
+  color: rgb(17, 17, 17);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  margin-bottom: 2px;
+}
+#rb-set-detective-panel .rb-preview-meta {
+  font-size: 11px;
+  color: #888;
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+#rb-set-detective-panel .rb-preview-itemno-link {
+  color: rgb(0, 111, 168);
+  text-decoration: none;
+}
+#rb-set-detective-panel .rb-preview-itemno-link:hover {
+  text-decoration: underline;
+}
+#rb-set-detective-panel .rb-preview-swatch {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  flex-shrink: 0;
+  vertical-align: middle;
+}

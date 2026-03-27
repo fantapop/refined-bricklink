@@ -38,6 +38,7 @@
         "features/wanted-list-download-buttons.js",
         "features/wanted-list-download-all.js",
         "features/wanted-list-merge.js",
+        "features/set-detective.js",
         "main.js"
       ],
       "run_at": "document_idle"

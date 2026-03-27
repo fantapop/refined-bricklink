@@ -14,8 +14,5 @@
 - Reverse sort order of wanted lists on the "Upload to Wanted List" page (there are two lists there).
 - Move "Create New Wanted List" to the top of the list.
 
-## Search
-- Allow searching for sets by a combination of parts (e.g. "4 of part A and 3 of part B").
-
 ## General UI
 - Pressing Esc while a modal is open should close it.

@@ -57,6 +57,14 @@ Replaces the items-per-page dropdown on wanted list search pages with a configur
 
 ### Search
 
+#### Set Detective
+
+Adds a **Set Detective** tab to the wanted list pages. Enter one or more parts with colors and minimum quantities, and Set Detective searches BrickLink to find every set that contains all of them — useful for identifying which set a partially assembled model came from.
+
+<img src="docs/screenshots/set-detective.png" width="700" alt="Set Detective tab showing two parts selected and three matching sets found, including The Stone Colossus of Ultimate Destruction">
+
+<br>
+
 #### Quantity Control Panel
 
 Adds match Have↔Want and revert controls to quantity fields on wanted list edit pages. Highlights changed rows in orange.
