@@ -181,3 +181,7 @@ See [CLAUDE.md](CLAUDE.md) for full developer documentation.
 ## Contributing
 
 Feature requests are welcome — feel free to [open an issue](https://github.com/fantapop/refined-bricklink/issues).
+
+---
+
+*Refined Bricklink is an independent project and is not affiliated with, endorsed by, or sponsored by BrickLink or the LEGO Group.*
