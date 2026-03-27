@@ -135,7 +135,7 @@ Reverses the order of lists in the "Add to Wanted List" modal so your most recen
 
 ### From the Chrome Web Store
 
-*Coming soon.*
+Install from the [Chrome Web Store](https://chromewebstore.google.com/detail/refined-bricklink/eajbedjjhgiamgkdhmpadgaocncpmhpj).
 
 ### From a release (manual)
 
