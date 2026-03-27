@@ -8,6 +8,7 @@ describe("main.js", () => {
   beforeEach(() => {
     document.head.innerHTML = "";
     document.body.innerHTML = "";
+    localStorage.clear();
     globalThis.RefinedBricklink = { features: [] };
     chrome.storage.sync.get.mockReset();
     chrome.runtime.getManifest.mockReturnValue({ version: "0.1.0" });
