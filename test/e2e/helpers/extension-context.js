@@ -15,14 +15,25 @@ export const userDataDir = path.resolve(
  * Launches a persistent context with the extension loaded,
  * reusing the shared Chrome profile so login state persists.
  */
+/**
+ * Launches a persistent context with the extension loaded,
+ * reusing the shared Chrome profile so login state persists.
+ *
+ * Set HEADED=1 in the environment to run with a visible browser window,
+ * useful for debugging a single test:
+ *   HEADED=1 npx playwright test --project=auth test/e2e/my-test.auth.spec.js
+ */
 export async function launchExtension() {
+  const headed = process.env.HEADED === "1";
+  const args = [
+    `--disable-extensions-except=${extensionPath}`,
+    `--load-extension=${extensionPath}`,
+  ];
+  if (!headed) args.push("--headless=new");
+
   const context = await chromium.launchPersistentContext(userDataDir, {
     headless: false,
-    args: [
-      `--disable-extensions-except=${extensionPath}`,
-      `--load-extension=${extensionPath}`,
-      "--headless=new",
-    ],
+    args,
   });
 
   return context;
