@@ -104,12 +104,12 @@ jobs:
         run: |
           ZIP="build/out/refined-bricklink-${{ steps.tag.outputs.name }}.zip"
 
-          ACCESS_TOKEN=$(curl -s -X POST https://oauth2.googleapis.com/token \
-            -d "client_id=${CHROME_CLIENT_ID}&client_secret=${CHROME_CLIENT_SECRET}&refresh_token=${CHROME_REFRESH_TOKEN}&grant_type=refresh_token" \
-            | jq -r '.access_token')
+          TOKEN_RESPONSE=$(curl -s -X POST https://oauth2.googleapis.com/token \
+            -d "client_id=${CHROME_CLIENT_ID}&client_secret=${CHROME_CLIENT_SECRET}&refresh_token=${CHROME_REFRESH_TOKEN}&grant_type=refresh_token")
+          ACCESS_TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.access_token')
 
           if [ -z "$ACCESS_TOKEN" ] || [ "$ACCESS_TOKEN" = "null" ]; then
-            echo "Failed to obtain access token"
+            echo "Failed to obtain access token: $(echo "$TOKEN_RESPONSE" | jq -r '.error // empty') - $(echo "$TOKEN_RESPONSE" | jq -r '.error_description // empty')"
             exit 1
           fi
 
