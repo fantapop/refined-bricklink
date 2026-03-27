@@ -38,6 +38,13 @@ Features register themselves: `RefinedBricklink.features.push(featureDef);`
 
 **Note:** Only bump `source/manifest.json` version when cutting a release, not during routine development.
 
+### Cutting a Release
+1. Bump version in `source/manifest.json`
+2. Update `docs/chrome-web-store.md` to reflect any new or changed features
+3. Run all tests (`npx vitest run` + `npx playwright test`)
+4. Tag the commit — CI builds and publishes the release zip automatically
+5. Paste the updated description from `docs/chrome-web-store.md` into the [Chrome Web Store dashboard](https://chrome.google.com/webstore/devconsole)
+
 ### Testing
 - **Unit tests:** `npx vitest run` (fast, no browser needed)
 - **E2E tests (no auth):** `npx playwright test --project=no-auth`
