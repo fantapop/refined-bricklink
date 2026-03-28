@@ -13,7 +13,8 @@
     "test:e2e:all": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:all": "vitest run && playwright test",
-    "check": "vitest run && node scripts/build.mjs"
+    "check": "vitest run && node scripts/build.mjs",
+    "refresh-token": "node scripts/refresh-webstore-token.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.50.0",
