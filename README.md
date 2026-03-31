@@ -59,7 +59,11 @@ Replaces the items-per-page dropdown on wanted list search pages with a configur
 
 #### Set Detective
 
-Adds a **Set Detective** tab to the wanted list pages. Enter one or more parts with colors and minimum quantities, and Set Detective searches BrickLink to find every set that contains all of them — useful for identifying which set a partially assembled model came from.
+Set Detective is a new tool for finding sets by entering in known quantities of
+specific parts. It can be useful for identifying the set if you have partially 
+assembled model without any one uniquely identifying piece.  Enter one or more
+parts with colors and minimum quantities, and Set Detective searches BrickLink
+to find every set that contains all of them.
 
 <img src="docs/screenshots/set-detective.png" width="700" alt="Set Detective tab showing two parts selected and three matching sets found, including The Stone Colossus of Ultimate Destruction">
 
