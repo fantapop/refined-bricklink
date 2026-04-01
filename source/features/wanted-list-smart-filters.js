@@ -85,7 +85,8 @@
       }
     }
 
-    // Restore all original options before filtering
+    // Restore all original options before filtering, preserving current selection
+    var currentValue = select.value;
     select.innerHTML = "";
     originalOptions[fieldName].forEach(function(optData) {
       var opt = document.createElement("option");
@@ -97,6 +98,14 @@
 
     // Get unique values from the wanted list items
     var uniqueValues = getUniqueValues(items, fieldName);
+
+    // "X" means "any / no preference" for the condition field.  If every item uses "X",
+    // there is nothing to filter (all conditions are valid) and nothing to auto-select
+    // (the "Any" option is already the default).  Restore options and bail out.
+    if (uniqueValues.length === 1 && uniqueValues[0] === "X") {
+      expectedSelectStates[fieldName] = null;
+      return;
+    }
 
     // Create a map of value -> display name from items
     var valueMap = {};
@@ -165,8 +174,17 @@
         console.warn("[wanted-list-smart-filters] Could not find matching option for value:", singleValue);
       }
     } else {
-      // Not auto-selecting, clear expected state
+      // Not auto-selecting: restore the value the user (or page URL) had selected,
+      // as long as it's still present in the filtered option list.
       expectedSelectStates[fieldName] = null;
+      if (currentValue) {
+        for (var j = 0; j < select.options.length; j++) {
+          if (select.options[j].value === currentValue) {
+            select.value = currentValue;
+            break;
+          }
+        }
+      }
     }
   }
 
@@ -213,8 +231,21 @@
       var wantedMoreID = getWantedMoreID();
       if (!wantedMoreID) return;
 
-      // Start fetching data in the background
-      fetchAllWantedItems(wantedMoreID).catch(function(err) {
+      // Start fetching data in the background.
+      // When the fetch completes, also apply filters immediately if the filter
+      // container is already visible — this handles the case where the page loaded
+      // with filter params in the URL (e.g. after clicking Apply), causing the
+      // container to appear before the fetch finished and the first applySmartFilters
+      // call to bail out with no items.
+      fetchAllWantedItems(wantedMoreID).then(function(items) {
+        if (!items) return;
+        var filterContainer = document.querySelector(".search-item-filters");
+        if (filterContainer) {
+          applySmartFilters().catch(function(err) {
+            console.error("[wanted-list-smart-filters] Post-fetch apply error:", err);
+          });
+        }
+      }).catch(function(err) {
         console.error("[wanted-list-smart-filters] Pre-fetch error:", err);
       });
 
@@ -273,41 +304,71 @@
         }
       };
 
-      // Watch table for edits, then poll to detect filter changes
-      // React updates filters 10-20ms after table mutations
+      // Watch the filter container and the edit table for React re-renders that
+      // reset the option lists back to the full unfiltered state.
       function setupFilterContainerWatcher() {
-        // Disconnect old table observer if exists
+        // Disconnect old observers
         if (tableObserver) {
           tableObserver.disconnect();
           tableObserver = null;
         }
+        if (filterContainerWatcher) {
+          filterContainerWatcher.disconnect();
+          filterContainerWatcher = null;
+        }
 
+        var filterContainer = document.querySelector(".search-item-filters");
+        if (filterContainer) {
+          // Watch the filter container itself for React re-renders.
+          // When React resets the selects (option count returns to the original full
+          // size), re-apply the smart filters.  Use a flag to avoid re-entry since
+          // applySmartFilters() itself mutates the options.
+          var reapplying = false;
+          filterContainerWatcher = new MutationObserver(function() {
+            if (reapplying) return;
+            var selects = filterContainer.querySelectorAll("select");
+            for (var i = 0; i < selects.length; i++) {
+              var select = selects[i];
+              var label = select.closest(".l-flex")?.querySelector("label")?.textContent?.trim();
+              var fieldName = null;
+              if (label === "Color:") fieldName = "colorID";
+              else if (label === "Condition:") fieldName = "wantedNew";
+              if (!fieldName || !originalOptions[fieldName]) continue;
+              // If option count is back to the original (unfiltered) size, React reset it
+              if (select.options.length >= originalOptions[fieldName].length) {
+                reapplying = true;
+                applySmartFilters().then(function() { reapplying = false; }).catch(function() { reapplying = false; });
+                return;
+              }
+            }
+          });
+          filterContainerWatcher.observe(filterContainer, { childList: true, subtree: true });
+        }
+
+        // Also watch the edit table for the edit-mode auto-select restore behaviour.
+        // React resets auto-selected values ~10-20ms after table mutations — poll to catch it.
         var table = document.querySelector(".table-wl-edit");
         if (!table) return;
 
-        // Watch table for mutations (user editing items)
         tableObserver = new MutationObserver(function() {
-          // Clear any existing polling interval
           if (pollIntervalId) {
             clearInterval(pollIntervalId);
             pollIntervalId = null;
           }
 
-          // Start polling to detect filter changes (React updates filters ~10-20ms after table)
           var checkCount = 0;
           var maxChecks = 100; // 100 checks * 5ms = 500ms max
 
           pollIntervalId = setInterval(function() {
             checkCount++;
-            var filterContainer = document.querySelector(".search-item-filters");
-            if (!filterContainer) {
+            var fc = document.querySelector(".search-item-filters");
+            if (!fc) {
               clearInterval(pollIntervalId);
               pollIntervalId = null;
               return;
             }
 
-            // Check if any filter select has changed from expected state
-            var selects = filterContainer.querySelectorAll("select");
+            var selects = fc.querySelectorAll("select");
             var needsRestore = false;
 
             for (var i = 0; i < selects.length; i++) {
