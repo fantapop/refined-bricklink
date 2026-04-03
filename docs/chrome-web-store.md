@@ -24,6 +24,7 @@ Feature List:
 - A summary of current edits
 - Navigation protection on unsaved edits
 - Pre-filtered item filters — no more sifting through every color!
+- Set thumbnails on wanted lists named with a set number — click to open a full image lightbox
 - Merge items from other wanted lists into the current one
 - Reverse sort wanted lists in "Add to Wanted List" modal
 - Set Detective — identify which set a partially assembled model came from
