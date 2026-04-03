@@ -16,13 +16,26 @@ import path from "path";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
 import { execFile } from "child_process";
-import { readFileSync, copyFileSync, mkdirSync } from "fs";
+import { readFileSync, copyFileSync, mkdirSync, readdirSync } from "fs";
 import { chromium } from "@playwright/test";
 import { extensionPath, userDataDir } from "../test/e2e/helpers/extension-context.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const screenshotsDir = path.resolve(__dirname, "../docs/screenshots");
 mkdirSync(screenshotsDir, { recursive: true });
+
+// Optional: pass a feature name as the first argument to auto-enumerate screenshots.
+// Usage: npm run screenshot -- wanted-list-set-image
+//        → names are auto-filled as wanted-list-set-image-1, wanted-list-set-image-2, …
+const featureName = process.argv[2] || null;
+let screenshotCounter = 1;
+if (featureName) {
+  const existing = readdirSync(screenshotsDir);
+  const re = new RegExp(`^${featureName}-(\\d+)\\.png$`);
+  const nums = existing.map(f => { const m = f.match(re); return m ? parseInt(m[1]) : 0; });
+  screenshotCounter = nums.length ? Math.max(...nums) + 1 : 1;
+  console.log(`Feature: ${featureName} — screenshots will be named ${featureName}-${screenshotCounter}, ${featureName}-${screenshotCounter + 1}, …\n`);
+}
 
 
 const context = await chromium.launchPersistentContext(userDataDir, {
@@ -38,6 +51,7 @@ const page = await context.newPage();
 
 // Path of the most recent screencapture output; reused by _rbSaveScreenshot
 let lastCapturePath = null;
+
 // Active screencapture child process (so Escape can kill it)
 let captureChild = null;
 let capturePromise = null;
@@ -127,6 +141,8 @@ await page.exposeFunction("_rbGetCapture", async () => {
 // Cancel capture — kills the in-flight screencapture process (Escape key).
 await page.exposeFunction("_rbCancelCapture", async () => {
   if (captureChild) { captureChild.kill(); captureChild = null; }
+  // Swallow the rejection from the killed process so Node doesn't crash
+  if (capturePromise) { capturePromise.catch(() => {}); }
   capturePromise = null;
   await page.evaluate(() => {
     const el = document.getElementById("_rb_ctrl");
@@ -138,6 +154,13 @@ await page.exposeFunction("_rbCancelCapture", async () => {
 await page.exposeFunction("_rbExit", async () => {
   await context.close();
   process.exit(0);
+});
+
+// Returns the pre-fill name for the next screenshot and advances the counter.
+// Counter lives in Node so it persists across page navigations.
+await page.exposeFunction("_rbNextScreenshotName", () => {
+  if (!featureName) return "";
+  return `${featureName}-${screenshotCounter++}`;
 });
 
 // Save — copies (or crops then saves) the last capture to docs/screenshots/
@@ -361,7 +384,7 @@ const PREVIEW_HTML = `
 `;
 
 async function injectController() {
-  await page.evaluate(({ css, ctrlHtml, previewHtml }) => {
+  await page.evaluate(({ css, ctrlHtml, previewHtml, featureName }) => {
     if (document.getElementById("_rb_ctrl")) return;
 
     // Style
@@ -656,7 +679,7 @@ async function injectController() {
       cropDisp = { t: 0, b: 0, l: 0, r: 0 };
       previewImg.onload = null; // clear any stale handler
       previewImg.src = result.dataUrl;
-      previewNameInput.value = "";
+      previewNameInput.value = await window._rbNextScreenshotName();
       previewOverlay.style.display = "flex";
       // Wait for the next paint so the flex layout resolves before reading offsetWidth/Height
       requestAnimationFrame(() => updateCropUI());
@@ -699,7 +722,7 @@ async function injectController() {
       if (e.target === previewOverlay) hidePreview();
     });
 
-  }, { css: CONTROLLER_CSS, ctrlHtml: CONTROLLER_HTML, previewHtml: PREVIEW_HTML });
+  }, { css: CONTROLLER_CSS, ctrlHtml: CONTROLLER_HTML, previewHtml: PREVIEW_HTML, featureName });
 }
 
 page.on("load", async () => {
