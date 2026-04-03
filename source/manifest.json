@@ -39,6 +39,7 @@
         "features/wanted-list-download-all.js",
         "features/wanted-list-merge.js",
         "features/set-detective.js",
+        "features/wanted-list-set-image.js",
         "main.js"
       ],
       "run_at": "document_idle"

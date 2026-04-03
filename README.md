@@ -45,6 +45,18 @@ Adds a button next to the search bar to bulk-download all your wanted lists as a
 
 <img src="docs/screenshots/wanted-list-download-filtered.png" width="600" alt="Wanted Lists page showing Download (3) button when search filter is active">
 
+#### Wanted List Set Images
+
+Shows a set thumbnail next to each wanted list whose name starts with a set number (e.g. "76940 - T. rex Dinosaur Fossil Exhibition"). Hover the thumbnail for a larger preview. On the wanted list search page, the thumbnail appears in the header alongside the list name. Click any thumbnail to open a lightbox with the full set image and any alternate images (instructions, original box).
+
+<img src="docs/screenshots/wanted-list-set-image-1.png" width="600" alt="Wanted Lists page showing a set thumbnail next to a list named with a set number">
+
+<img src="docs/screenshots/wanted-list-set-image-3.png" width="600" alt="Wanted list search page showing the set thumbnail in the header next to the list name">
+
+<img src="docs/screenshots/wanted-list-set-image-4.png" width="600" alt="Lightbox showing full set image with thumbnail strip for alternate images">
+
+<br>
+
 #### Default Page Size
 
 Rewrites wanted list links to open directly with your preferred number of items per page, so you never have to change the selector manually. Configure the default via the Customize panel (e.g. 100 or 500).

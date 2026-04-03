@@ -217,6 +217,56 @@ h1 {
   font-size: 12px;
   color: #aaa;
   line-height: 1.4;
+  white-space: pre-line;
+}
+
+/* Examples grid under a setting description */
+.style-examples {
+  margin-top: 6px;
+}
+
+.style-examples-header {
+  font-size: 11px;
+  color: #aaa;
+  margin-bottom: 3px;
+}
+
+.style-examples-grid {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 3px 10px;
+  align-items: baseline;
+}
+
+.style-example-pattern {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 11px;
+  color: #666;
+}
+
+.style-example-desc {
+  font-size: 11px;
+  color: #aaa;
+}
+
+/* Textarea settings stack label/desc above the input */
+.style-row--wide {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.style-textarea {
+  width: 100%;
+  padding: 4px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  color: #555;
+  resize: vertical;
+  box-sizing: border-box;
+  margin-top: 6px;
+  line-height: 1.5;
 }
 
 /* Color input + hex value grouped together */

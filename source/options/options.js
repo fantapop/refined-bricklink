@@ -114,9 +114,9 @@
 
           // ── Settings rows ─────────────────────────────────────────
           for (const s of cardSettings) {
-            if (s.type !== "boolean" && s.type !== "text" && s.type !== "select") continue;
+            if (s.type !== "boolean" && s.type !== "text" && s.type !== "textarea" && s.type !== "select") continue;
             const row = document.createElement("div");
-            row.className = "style-row";
+            row.className = s.type === "textarea" ? "style-row style-row--wide" : "style-row";
 
             const rowInfo = document.createElement("div");
             rowInfo.className = "style-info";
@@ -126,10 +126,35 @@
             label.textContent = s.label;
             rowInfo.appendChild(label);
 
-            const rowDesc = document.createElement("div");
-            rowDesc.className = "style-desc";
-            rowDesc.textContent = s.description;
-            rowInfo.appendChild(rowDesc);
+            if (s.description) {
+              const rowDesc = document.createElement("div");
+              rowDesc.className = "style-desc";
+              rowDesc.textContent = s.description;
+              rowInfo.appendChild(rowDesc);
+            }
+
+            if (s.examples) {
+              const examplesEl = document.createElement("div");
+              examplesEl.className = "style-examples";
+              const header = document.createElement("div");
+              header.className = "style-examples-header";
+              header.textContent = "Examples:";
+              examplesEl.appendChild(header);
+              const grid = document.createElement("div");
+              grid.className = "style-examples-grid";
+              for (const [pattern, desc] of s.examples) {
+                const patEl = document.createElement("code");
+                patEl.className = "style-example-pattern";
+                patEl.textContent = pattern;
+                grid.appendChild(patEl);
+                const descEl = document.createElement("span");
+                descEl.className = "style-example-desc";
+                descEl.textContent = desc;
+                grid.appendChild(descEl);
+              }
+              examplesEl.appendChild(grid);
+              rowInfo.appendChild(examplesEl);
+            }
 
             row.appendChild(rowInfo);
 
@@ -182,6 +207,17 @@
                 chrome.storage.sync.set({ [s.name]: input.value });
               });
               row.appendChild(input);
+            } else if (s.type === "textarea") {
+              const ta = document.createElement("textarea");
+              ta.value = settings[s.name] ?? s.default;
+              ta.className = "style-textarea";
+              ta.placeholder = s.default;
+              ta.rows = 1;
+              ta.spellcheck = false;
+              ta.addEventListener("change", function () {
+                chrome.storage.sync.set({ [s.name]: ta.value });
+              });
+              row.appendChild(ta);
             }
             varsSection.appendChild(row);
           }

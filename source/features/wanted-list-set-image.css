@@ -1,0 +1,177 @@
+/* List page — flex row keeps image and name text side by side */
+.rb-set-img-row {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px;
+}
+
+/* List page — thumbnail, pushed to right of name column */
+.rb-set-img {
+  width: 60px !important;
+  height: 50px !important;
+  object-fit: contain !important;
+  flex-shrink: 0 !important;
+  margin-left: auto !important;
+  margin-right: 12px !important;
+  position: relative !important;
+  z-index: 0;
+  transform-origin: center center;
+  transition: transform 0.15s ease;
+  cursor: zoom-in;
+}
+
+.rb-set-img:hover {
+  transform: scale(3);
+  z-index: 100;
+}
+
+/* Completion column — trim width to give more room to the name column */
+.progress-bar-container--overview {
+  max-width: 85px !important;
+}
+
+/* Search page — title + image wrapper */
+.rb-set-img-title-wrap {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* The title element has an inline max-width:60% that causes wrapping — remove it */
+.rb-set-img-title-wrap .l-flex.l-split {
+  max-width: none !important;
+}
+
+/* Search page — header image */
+.rb-set-img-header {
+  height: 60px;
+  width: auto;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+/* Tighten the header row vertically to accommodate the taller image */
+.container-header {
+  padding-top: 4px !important;
+  padding-bottom: 4px !important;
+}
+
+/* Shrink the left overview sidebar to free up horizontal space */
+.bl-3 .overview-table {
+  width: 230px !important;
+}
+
+/* Column widths on the wanted list index table */
+.wl-overview-list-table th:nth-child(1) { width: 45% !important; }
+.wl-overview-list-table th:nth-child(2) { width: 10% !important; }
+.wl-overview-list-table th:nth-child(3) { width: 15% !important; }
+.wl-overview-list-table th:nth-child(4) { width: 30% !important; }
+
+/* ── Lightbox ──────────────────────────────────────────────────────────── */
+
+#rb-lightbox-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.65);
+  z-index: 10000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#rb-lightbox {
+  display: flex;
+  background: #fff;
+  border: 5px solid #ccc;
+  max-width: 90vw;
+  max-height: 90vh;
+  overflow: hidden;
+}
+
+/* Thumbnail column — matches .blLILThumbContainer: bg #eee, right border 5px solid #ccc */
+.rb-lil-thumbs {
+  width: 140px;
+  flex-shrink: 0;
+  background: #eee;
+  border-right: 5px solid #ccc;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+
+/* Each thumb — matches .blLILThumbImg: bg #fff, border ~3px solid #999, padding 3px, margin 5px */
+.rb-lil-thumb {
+  background: #fff;
+  border: 1px solid #ccc;
+  cursor: pointer;
+  padding: 3px;
+  margin: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+}
+
+.rb-lil-thumb:hover {
+  border-color: #999;
+}
+
+.rb-lil-thumb-selected {
+  border: 3px solid #999 !important;
+}
+
+.rb-lil-thumb img {
+  width: 100px;
+  height: 80px;
+  object-fit: contain;
+  display: block;
+}
+
+/* Main column — matches .blLILImgContainer: padding 10px, margin-left 10px */
+.rb-lil-main {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px;
+  margin-left: 10px;
+  min-width: 400px;
+  max-width: 70vw;
+}
+
+/* Close button — matches blLILClose: display block, top-right */
+.rb-lil-close {
+  display: block;
+  align-self: flex-end;
+  margin-bottom: 4px;
+}
+
+.rb-lil-close img {
+  border: 0;
+  display: block;
+}
+
+.rb-lil-img-wrapper {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 0;
+}
+
+.rb-lil-img {
+  max-width: 100%;
+  max-height: calc(90vh - 80px);
+  object-fit: contain;
+  display: block;
+}
+
+/* Caption — matches .blLILTitle exactly */
+.rb-lil-title {
+  display: block;
+  font: bold 11px/15px Verdana, Helvetica, sans-serif;
+  margin-top: 10px;
+  max-width: 640px;
+}
